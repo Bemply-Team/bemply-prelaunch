@@ -36,7 +36,7 @@ export default function ProgressSection() {
   }, [])
 
   return (
-    <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-4 xl:space-y-5 max-w-sm sm:max-w-md md:max-w-lg mx-auto px-6 sm:px-8">
+    <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:pb-20 lg:space-y-4 xl:space-y-5 max-w-sm sm:max-w-md md:max-w-lg mx-auto px-6 sm:px-8">
       {/* Progress Bar */}
       <div className="relative">
         <div className="w-full h-6 sm:h-6 md:h-7 lg:h-6 xl:h-7 bg-white/40 rounded-full border-2 border-teal-400/60 overflow-hidden">
@@ -82,7 +82,7 @@ export default function ProgressSection() {
             className="rounded-full sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 border-2 border-white/50 relative z-40"
           />
         </div>
-        <span className="font-montserrat font-semibold text-sm sm:text-base lg:text-base xl:text-sm text-gray-700 text-center">
+        <span className="font-montserrat font-semibold text-base sm:text-sm lg:text-base xl:text-sm text-gray-700 text-center">
           Join {count}+ others on the waitlist
         </span>
       </div>

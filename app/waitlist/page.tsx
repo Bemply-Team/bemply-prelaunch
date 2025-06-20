@@ -119,7 +119,7 @@ export default function WaitlistPage() {
       <SharedLayout variant="form" showFooter={true}>
         {/* Navigation - Fixed height */}
         <div className="flex-shrink-0">
-          <SharedNavigation variant="compact" />
+          <SharedNavigation variant="default" />
         </div>
 
         {/* Waitlist Form Container - Flexible height with consistent structure */}

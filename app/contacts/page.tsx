@@ -107,7 +107,7 @@ export default function ContactsPage() {
       <SharedLayout variant="form" showFooter={true}>
         {/* Navigation - Fixed height */}
         <div className="flex-shrink-0">
-          <SharedNavigation variant="compact" />
+          <SharedNavigation variant="default" />
         </div>
 
         {/* Contact Form Container - Flexible height with consistent structure */}

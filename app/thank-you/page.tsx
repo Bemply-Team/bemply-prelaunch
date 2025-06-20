@@ -12,7 +12,7 @@ export default function ThankYouPage() {
       <div className="flex flex-col justify-between h-full min-h-[500px] sm:min-h-[550px] md:min-h-[600px] lg:min-h-[480px] xl:min-h-[520px]">
         {/* Top Section - Fixed height */}
         <div className="flex-shrink-0">
-          <SharedNavigation variant="compact" />
+          <SharedNavigation variant="default" />
 
           {/* Decorative Line */}
           <div className="flex justify-center mt-6 lg:mt-8 mb-8 lg:mb-12">
