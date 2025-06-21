@@ -274,8 +274,8 @@ export default function ContactsPage() {
                       </div>
 
                       {/* reCAPTCHA - Fixed height */}
-                      <div className="w-full py-2">
-                        <div className="w-full bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
+                      <div className="w-full flex justify-center py-2">
+                        <div className="w-max bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
                           <ReCAPTCHA
                             sitekey={
                               process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
@@ -306,15 +306,53 @@ export default function ContactsPage() {
             </div>
           </div>
         </div>
+        <div className="absolute bottom-4 left-6 sm:bottom-6 sm:left-8 md:bottom-8 md:left-10 lg:bottom-4 lg:left-6 xl:bottom-6 xl:left-8 flex items-center space-x-4 sm:space-x-5 lg:space-x-4 xl:space-x-5">
+          <button className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/icons/instagram.png"
+              alt="Instagram"
+              width={18}
+              height={18}
+              className="sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
+            />
+          </button>
+          <button className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/icons/twitter.png"
+              alt="Twitter"
+              width={18}
+              height={18}
+              className="sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
+            />
+          </button>
+          <button className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/icons/tiktok.png"
+              alt="TikTok"
+              width={18}
+              height={18}
+              className="sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
+            />
+          </button>
+          <button className="hover:opacity-80 transition-opacity">
+            <Image
+              src="/icons/linkedin.png"
+              alt="LinkedIn"
+              width={18}
+              height={18}
+              className="sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6"
+            />
+          </button>
+        </div>
 
         {/* Logo - Positioned at bottom right */}
-        <div className="hidden lg:block absolute bottom-4 right-6 xl:bottom-6 xl:right-8">
+        <div className="hidden lg:block absolute bottom-12 right-6  ">
           <Image
             src="/bemply-logo.png"
             alt="Bemply Logo"
             width={180}
             height={54}
-            className="h-10 xl:h-12 w-auto opacity-80"
+            className="h-20 w-auto opacity-80"
           />
         </div>
       </SharedLayout>

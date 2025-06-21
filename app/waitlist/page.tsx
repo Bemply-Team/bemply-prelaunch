@@ -387,13 +387,13 @@ export default function WaitlistPage() {
         </div>
 
         {/* Logo - Optimized positioning */}
-        <div className="hidden lg:block absolute bottom-4 right-6 xl:bottom-6 xl:right-8">
+        <div className="hidden lg:block absolute right-6 bottom-12">
           <Image
             src="/bemply-logo.png"
             alt="Bemply Logo"
             width={180}
             height={54}
-            className="h-10 xl:h-12 w-auto opacity-80"
+            className="h-20 w-auto opacity-80"
           />
         </div>
       </SharedLayout>

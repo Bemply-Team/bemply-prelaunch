@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import SharedLayout from "@/components/shared-layout"
-import SharedNavigation from "@/components/shared-navigation"
-import SocialIcons from "./components/social-icons"
-import Image from "next/image"
+import SharedLayout from "@/components/shared-layout";
+import SharedNavigation from "@/components/shared-navigation";
+import SocialIcons from "./components/social-icons";
+import Image from "next/image";
 
 export default function ThankYouPage() {
   return (
@@ -31,7 +31,7 @@ export default function ThankYouPage() {
           </h1>
 
           {/* Content Text - Using Cousine with exact line breaks */}
-          <div className="space-y-4 lg:space-y-6">
+          <div>
             <p className="font-cousine text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl text-gray-700 leading-relaxed">
               Thank you for your interest in Bemply !
             </p>
@@ -75,5 +75,5 @@ export default function ThankYouPage() {
         />
       </div>
     </SharedLayout>
-  )
+  );
 }

@@ -2,10 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Montserrat, Cousine, Josefin_Sans, Oswald, Inter, Cuprum, Lato } from "next/font/google"
 import Script from "next/script"
-import SplashWrapper from "@/components/splash-wrapper"
 import "./globals.css"
 // Import the WaitlistProvider
 import { WaitlistProvider } from "@/context/waitlist-context"
+import SplashScreen from "@/components/splash-wrapper"
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -66,7 +66,7 @@ export default function RootLayout({
         className={`${montserrat.variable} ${cousine.variable} ${josefinSans.variable} ${oswald.variable} ${inter.variable} ${cuprum.variable} ${lato.variable} antialiased`}
       >
         <WaitlistProvider>
-          <SplashWrapper>{children}</SplashWrapper>
+          <SplashScreen>{children}</SplashScreen>
         </WaitlistProvider>
       </body>
     </html>
