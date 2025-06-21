@@ -3,7 +3,7 @@ import SharedNavigation from "@/components/shared-navigation";
 import Logo from "./components/logo";
 import ComingSoonSection from "./components/coming-soon-section";
 import ProgressSection from "./components/progress-section";
-import NotifyButton from "./components/notify-button";
+import NotifyButton from "@/components/notify-button";
 import SocialIcons from "./components/social-icons";
 
 export default function HowSoonPage() {
@@ -23,7 +23,9 @@ export default function HowSoonPage() {
         <div className="text-center space-y-6  sm:space-y-8 md:space-y-10 lg:space-y-6 xl:space-y-8 flex-1 flex flex-col justify-center min-h-[200px]">
           <ComingSoonSection />
           <ProgressSection />
-          <NotifyButton />
+          <div className="lg:absolute lg:bottom-5  lg:left-1/2 lg:-translate-x-1/2">
+            <NotifyButton />
+          </div>
         </div>
 
         {/* Bottom spacer for social icons - Fixed height */}

@@ -314,7 +314,7 @@ export default function WaitlistPage() {
 
                       {/* reCAPTCHA - Fixed height */}
                       <div className="w-full py-2">
-                        <div className="w-full bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
+                        <div className="w-max mx-auto bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
                           <ReCAPTCHA
                             sitekey={
                               process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||

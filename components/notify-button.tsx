@@ -19,7 +19,7 @@ export default function NotifyButton() {
   };
 
   return (
-    <div className="px-6 sm:px-8 lg:absolute lg:bottom-5  lg:left-1/2 lg:-translate-x-1/2 ">
+    <div className="px-6 sm:px-8 ">
       <button
         onClick={handleClick}
         className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-purple-500 px-10 sm:px-12 lg:px-12 xl:px-14 py-4 sm:py-5 lg:py-4 xl:py-5 rounded-full font-montserrat font-semibold text-base sm:text-lg lg:text-lg xl:text-2xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center mx-auto"

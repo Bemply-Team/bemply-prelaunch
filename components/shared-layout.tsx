@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import AnimatedBackground from "@/app/how-soon/components/animated-background";
 import Image from "next/image";
+import Link from "next/link";
 
 interface SharedLayoutProps {
   children: ReactNode;
@@ -60,10 +61,21 @@ export default function SharedLayout({
             <div className="flex-1 flex justify-center">
               <p className="font-cousine font-medium text-xs sm:text-sm text-violet text-center sm:text-left">
                 Built with care by Bemply Inc. |{" "}
-                <button className="hover:underline">Learn more</button> -{" "}
-                <button className="hover:underline">[About Us]</button> |{" "}
-                <button className="hover:underline">Terms</button> |{" "}
-                <button className="hover:underline">Privacy</button>
+                <Link href="/about" className="hover:underline">
+                  Learn more
+                </Link>{" "}
+                -{" "}
+                <Link href="/about" className="hover:underline">
+                  [About Us]
+                </Link>{" "}
+                |{" "}
+                <Link href="/terms" className="hover:underline">
+                  Terms
+                </Link>{" "}
+                |{" "}
+                <Link href="/privacy" className="hover:underline">
+                  Privacy
+                </Link>
               </p>
             </div>
 

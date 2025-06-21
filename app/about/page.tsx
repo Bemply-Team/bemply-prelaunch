@@ -5,6 +5,7 @@ import SharedNavigation from "@/components/shared-navigation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useWaitlist } from "@/context/waitlist-context";
+import NotifyButton from "@/components/notify-button";
 
 export default function AboutPage() {
   const router = useRouter();
@@ -106,21 +107,7 @@ export default function AboutPage() {
       </div>
 
       {/* Notify Me Button - Fixed at bottom */}
-      <div className="mt-2 lg:mt-2 flex justify-center flex-shrink-0">
-        <button
-          onClick={handleNotifyClick}
-          className="bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-purple-400 px-10 sm:px-12 lg:px-12 xl:px-14 py-4 sm:py-5 lg:py-4 xl:py-5 rounded-full font-montserrat font-semibold text-base sm:text-lg lg:text-lg xl:text-xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center"
-        >
-          <Image
-            src="/icons/mail.png"
-            alt="Mail"
-            width={22}
-            height={22}
-            className="mr-3 sm:w-6 sm:h-6 lg:w-6 lg:h-6 xl:w-7 xl:h-7"
-          />
-          {isComplete ? "Get Started" : "Notify Me"}
-        </button>
-      </div>
+      <NotifyButton />
     </SharedLayout>
   );
 }
