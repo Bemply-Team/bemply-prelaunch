@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/navigation";
@@ -14,18 +14,18 @@ import { storageService } from "@/services/storage";
 
 // Validation schema
 const WaitlistSchema = Yup.object().shape({
-  firstName: Yup.string()
+  first_name: Yup.string()
     .min(2, "First name must be at least 2 characters")
     .max(50, "First name must be less than 50 characters")
     .required("First name is required"),
-  lastName: Yup.string()
+  last_name: Yup.string()
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters")
     .required("Last name is required"),
   email: Yup.string()
     .email("Please enter a valid email address")
     .required("Email address is required"),
-  companyName: Yup.string()
+  company: Yup.string()
     .min(2, "Company name must be at least 2 characters")
     .max(100, "Company name must be less than 100 characters")
     .required("Company name is required"),
@@ -53,6 +53,15 @@ export default function WaitlistPage() {
     message: "",
   });
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaError, setRecaptchaError] = useState<string>("");
+  const [isRecaptchaExpired, setIsRecaptchaExpired] = useState(false);
+  const [recaptchaVerifiedAt, setRecaptchaVerifiedAt] = useState<number | null>(
+    null
+  );
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  // 1 minute grace period in milliseconds
+  const RECAPTCHA_GRACE_PERIOD = 60 * 1000;
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ show: true, type, message });
@@ -63,6 +72,82 @@ export default function WaitlistPage() {
 
   const handleRecaptchaChange = (token: string | null) => {
     setRecaptchaToken(token);
+    setRecaptchaError("");
+    setIsRecaptchaExpired(false);
+
+    // Record verification time when token is received
+    if (token) {
+      setRecaptchaVerifiedAt(Date.now());
+    } else {
+      setRecaptchaVerifiedAt(null);
+    }
+  };
+
+  const handleRecaptchaExpired = () => {
+    setRecaptchaToken(null);
+    setIsRecaptchaExpired(true);
+    setRecaptchaVerifiedAt(null);
+    setRecaptchaError("reCAPTCHA has expired. Please verify again.");
+  };
+
+  const handleRecaptchaError = () => {
+    setRecaptchaToken(null);
+    setRecaptchaError("reCAPTCHA verification failed. Please try again.");
+    setRecaptchaVerifiedAt(null);
+  };
+
+  // Check if we're still within the grace period
+  const isWithinGracePeriod = () => {
+    if (!recaptchaVerifiedAt) return false;
+    const timeElapsed = Date.now() - recaptchaVerifiedAt;
+    return timeElapsed < RECAPTCHA_GRACE_PERIOD;
+  };
+
+  // Check if reCAPTCHA is considered valid (has token or within grace period)
+  const isRecaptchaValid = () => {
+    return recaptchaToken || isWithinGracePeriod();
+  };
+
+  const executeRecaptcha = async (): Promise<string | null> => {
+    // If we have a valid token, use it
+    if (recaptchaToken && !isRecaptchaExpired) {
+      return recaptchaToken;
+    }
+
+    // If we're within grace period, try to execute invisibly first
+    if (isWithinGracePeriod()) {
+      try {
+        if (recaptchaRef.current) {
+          const token = await recaptchaRef.current.executeAsync();
+          setRecaptchaToken(token);
+          setRecaptchaError("");
+          setIsRecaptchaExpired(false);
+          return token;
+        }
+      } catch (error) {
+        console.log(
+          "Invisible reCAPTCHA execution failed, user will need to verify manually"
+        );
+      }
+    }
+
+    // If no token or expired, try to execute reCAPTCHA
+    try {
+      if (recaptchaRef.current) {
+        const token = await recaptchaRef.current.executeAsync();
+        setRecaptchaToken(token);
+        setRecaptchaError("");
+        setIsRecaptchaExpired(false);
+        return token;
+      }
+    } catch (error) {
+      console.error("reCAPTCHA execution failed:", error);
+      setRecaptchaError(
+        "reCAPTCHA verification failed. Please complete the verification manually."
+      );
+    }
+
+    return null;
   };
 
   const handleSubmit = async (
@@ -70,15 +155,33 @@ export default function WaitlistPage() {
     { setSubmitting, resetForm }: any
   ) => {
     try {
-      // Check if reCAPTCHA is completed
-      if (!recaptchaToken) {
-        showToast("error", "Please complete the reCAPTCHA verification.");
+      // Try to get a valid reCAPTCHA token
+      let validToken = recaptchaToken;
+
+      // If no token but within grace period, try to get a fresh token
+      if (!validToken && isWithinGracePeriod()) {
+        validToken = await executeRecaptcha();
+      }
+
+      // If no token and not within grace period, try to execute reCAPTCHA
+      if (!validToken && !isWithinGracePeriod()) {
+        validToken = await executeRecaptcha();
+      }
+
+      // If still no token, show error but allow manual completion
+      if (!validToken) {
+        setRecaptchaError(
+          "Please complete the reCAPTCHA verification before submitting."
+        );
         setSubmitting(false);
         return;
       }
 
       // Submit waitlist form using API service
-      const response = await apiService.submitWaitlist(values);
+      const response = await apiService.submitWaitlist({
+        ...values,
+        recaptcha: validToken,
+      });
 
       if (response.success) {
         // Store waitlist data in localStorage
@@ -91,16 +194,33 @@ export default function WaitlistPage() {
           storageService.storeWaitlistStatus(response.percentage, count + 1);
         }
 
+        // Reset reCAPTCHA and clear grace period
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setRecaptchaError("");
+        setIsRecaptchaExpired(false);
+        setRecaptchaVerifiedAt(null);
+
         // Redirect to thank you page
         router.push("/thank-you");
       } else {
         showToast("error", response.message);
+        // Reset reCAPTCHA on API error to allow retry
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setIsRecaptchaExpired(false);
+        setRecaptchaVerifiedAt(null);
       }
     } catch (error) {
       showToast(
         "error",
         "An unexpected error occurred. Please try again later."
       );
+      // Reset reCAPTCHA on unexpected error
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
+      setIsRecaptchaExpired(false);
+      setRecaptchaVerifiedAt(null);
     } finally {
       setSubmitting(false);
     }
@@ -139,17 +259,18 @@ export default function WaitlistPage() {
             <div className="flex-1 min-h-0">
               <Formik
                 initialValues={{
-                  firstName: "",
-                  lastName: "",
+                  first_name: "",
+                  last_name: "",
                   email: "",
-                  companyName: "",
+                  company: "",
                   position: "",
                   industry: "",
+                  recaptcha: "",
                 }}
                 validationSchema={WaitlistSchema}
                 onSubmit={handleSubmit}
               >
-                {({ isSubmitting, errors, touched }) => (
+                {({ isSubmitting, errors, touched, setFieldValue }) => (
                   <Form className="space-y-2 lg:space-y-3 h-full flex flex-col">
                     {/* Form Fields Container - Flexible height */}
                     <div className="flex-1 space-y-2 lg:space-y-3">
@@ -157,24 +278,24 @@ export default function WaitlistPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 lg:gap-4">
                         <div>
                           <label
-                            htmlFor="firstName"
+                            htmlFor="first_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             First name
                           </label>
                           <Field
                             type="text"
-                            id="firstName"
-                            name="firstName"
+                            id="first_name"
+                            name="first_name"
                             placeholder="Jane"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.firstName && touched.firstName
+                              errors.first_name && touched.first_name
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="firstName"
+                            name="first_name"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -182,24 +303,24 @@ export default function WaitlistPage() {
 
                         <div>
                           <label
-                            htmlFor="lastName"
+                            htmlFor="last_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Last name
                           </label>
                           <Field
                             type="text"
-                            id="lastName"
-                            name="lastName"
+                            id="last_name"
+                            name="last_name"
                             placeholder="Smitherton"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.lastName && touched.lastName
+                              errors.last_name && touched.last_name
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="lastName"
+                            name="last_name"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -235,24 +356,24 @@ export default function WaitlistPage() {
 
                         <div>
                           <label
-                            htmlFor="companyName"
+                            htmlFor="company"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Company Name
                           </label>
                           <Field
                             type="text"
-                            id="companyName"
-                            name="companyName"
-                            placeholder="FakeDomain"
+                            id="company"
+                            name="company"
+                            placeholder="Your company name"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.companyName && touched.companyName
+                              errors.company && touched.company
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="companyName"
+                            name="company"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -316,15 +437,42 @@ export default function WaitlistPage() {
                       <div className="w-full py-2">
                         <div className="w-max mx-auto bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
                           <ReCAPTCHA
-                            sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
-                              "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-                            }
+                            ref={recaptchaRef}
+                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
                             onChange={handleRecaptchaChange}
+                            onExpired={handleRecaptchaExpired}
+                            onErrored={handleRecaptchaError}
                             theme="light"
                             size="normal"
                           />
                         </div>
+                        {recaptchaError && (
+                          <div className="mt-2 text-xs text-red-600 font-medium text-center">
+                            {recaptchaError}
+                          </div>
+                        )}
+                        {isRecaptchaExpired && !isWithinGracePeriod() && (
+                          <div className="mt-2 text-xs text-amber-600 font-medium text-center">
+                            reCAPTCHA expired. It will be refreshed
+                            automatically when you submit.
+                          </div>
+                        )}
+                        {isWithinGracePeriod() && !recaptchaToken && (
+                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
+                            ✓ Verified - You can make changes for{" "}
+                            {Math.ceil(
+                              (RECAPTCHA_GRACE_PERIOD -
+                                (Date.now() - (recaptchaVerifiedAt || 0))) /
+                                1000
+                            )}{" "}
+                            more seconds
+                          </div>
+                        )}
+                        {recaptchaToken && (
+                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
+                            ✓ reCAPTCHA verified
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -332,7 +480,7 @@ export default function WaitlistPage() {
                     <div className="pt-2 px-4 flex-shrink-0">
                       <button
                         type="submit"
-                        disabled={isSubmitting || !recaptchaToken}
+                        disabled={isSubmitting}
                         className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-inter font-extrabold text-base lg:text-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         style={{ color: "#5741FF" }}
                       >

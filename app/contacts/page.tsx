@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import SharedLayout from "@/components/shared-layout";
@@ -46,6 +46,15 @@ export default function ContactsPage() {
     message: "",
   });
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [recaptchaError, setRecaptchaError] = useState<string>("");
+  const [isRecaptchaExpired, setIsRecaptchaExpired] = useState(false);
+  const [recaptchaVerifiedAt, setRecaptchaVerifiedAt] = useState<number | null>(
+    null
+  );
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  // 1 minute grace period in milliseconds
+  const RECAPTCHA_GRACE_PERIOD = 60 * 1000;
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ show: true, type, message });
@@ -56,6 +65,82 @@ export default function ContactsPage() {
 
   const handleRecaptchaChange = (token: string | null) => {
     setRecaptchaToken(token);
+    setRecaptchaError("");
+    setIsRecaptchaExpired(false);
+
+    // Record verification time when token is received
+    if (token) {
+      setRecaptchaVerifiedAt(Date.now());
+    } else {
+      setRecaptchaVerifiedAt(null);
+    }
+  };
+
+  const handleRecaptchaExpired = () => {
+    setRecaptchaToken(null);
+    setIsRecaptchaExpired(true);
+    setRecaptchaVerifiedAt(null);
+    setRecaptchaError("reCAPTCHA has expired. Please verify again.");
+  };
+
+  const handleRecaptchaError = () => {
+    setRecaptchaToken(null);
+    setRecaptchaError("reCAPTCHA verification failed. Please try again.");
+    setRecaptchaVerifiedAt(null);
+  };
+
+  // Check if we're still within the grace period
+  const isWithinGracePeriod = () => {
+    if (!recaptchaVerifiedAt) return false;
+    const timeElapsed = Date.now() - recaptchaVerifiedAt;
+    return timeElapsed < RECAPTCHA_GRACE_PERIOD;
+  };
+
+  // Check if reCAPTCHA is considered valid (has token or within grace period)
+  const isRecaptchaValid = () => {
+    return recaptchaToken || isWithinGracePeriod();
+  };
+
+  const executeRecaptcha = async (): Promise<string | null> => {
+    // If we have a valid token, use it
+    if (recaptchaToken && !isRecaptchaExpired) {
+      return recaptchaToken;
+    }
+
+    // If we're within grace period, try to execute invisibly first
+    if (isWithinGracePeriod()) {
+      try {
+        if (recaptchaRef.current) {
+          const token = await recaptchaRef.current.executeAsync();
+          setRecaptchaToken(token);
+          setRecaptchaError("");
+          setIsRecaptchaExpired(false);
+          return token;
+        }
+      } catch (error) {
+        console.log(
+          "Invisible reCAPTCHA execution failed, user will need to verify manually"
+        );
+      }
+    }
+
+    // If no token or expired, try to execute reCAPTCHA
+    try {
+      if (recaptchaRef.current) {
+        const token = await recaptchaRef.current.executeAsync();
+        setRecaptchaToken(token);
+        setRecaptchaError("");
+        setIsRecaptchaExpired(false);
+        return token;
+      }
+    } catch (error) {
+      console.error("reCAPTCHA execution failed:", error);
+      setRecaptchaError(
+        "reCAPTCHA verification failed. Please complete the verification manually."
+      );
+    }
+
+    return null;
   };
 
   const handleSubmit = async (
@@ -63,28 +148,60 @@ export default function ContactsPage() {
     { setSubmitting, resetForm }: any
   ) => {
     try {
-      // Check if reCAPTCHA is completed
-      if (!recaptchaToken) {
-        showToast("error", "Please complete the reCAPTCHA verification.");
+      // Try to get a valid reCAPTCHA token
+      let validToken = recaptchaToken;
+
+      // If no token but within grace period, try to get a fresh token
+      if (!validToken && isWithinGracePeriod()) {
+        validToken = await executeRecaptcha();
+      }
+
+      // If no token and not within grace period, try to execute reCAPTCHA
+      if (!validToken && !isWithinGracePeriod()) {
+        validToken = await executeRecaptcha();
+      }
+
+      // If still no token, show error but allow manual completion
+      if (!validToken) {
+        setRecaptchaError(
+          "Please complete the reCAPTCHA verification before submitting."
+        );
         setSubmitting(false);
         return;
       }
 
       // Submit contact form using API service
-      const response = await apiService.submitContact(values);
+      const response = await apiService.submitContact({
+        ...values,
+        recaptcha: validToken,
+      });
 
       if (response.success) {
         showToast("success", response.message);
         resetForm();
+
+        // Reset reCAPTCHA and clear grace period
+        recaptchaRef.current?.reset();
         setRecaptchaToken(null);
-        // Reset reCAPTCHA
-        if (window.grecaptcha) {
-          window.grecaptcha.reset();
-        }
+        setRecaptchaError("");
+        setIsRecaptchaExpired(false);
+        setRecaptchaVerifiedAt(null);
       } else {
+        // If server says reCAPTCHA is invalid, refresh it
+        if (
+          response.message?.toLowerCase().includes("recaptcha") ||
+          response.message?.toLowerCase().includes("captcha")
+        ) {
+          setRecaptchaError("reCAPTCHA verification failed. Please try again.");
+          recaptchaRef.current?.reset();
+          setRecaptchaToken(null);
+          setIsRecaptchaExpired(false);
+          setRecaptchaVerifiedAt(null);
+        }
         showToast("error", response.message);
       }
     } catch (error) {
+      // On network errors, don't reset reCAPTCHA to avoid frustrating user
       showToast(
         "error",
         "An unexpected error occurred. Please try again later."
@@ -136,7 +253,7 @@ export default function ContactsPage() {
                 validationSchema={ContactSchema}
                 onSubmit={handleSubmit}
               >
-                {({ isSubmitting, errors, touched }) => (
+                {({ isSubmitting, errors, touched, isValid, dirty }) => (
                   <Form className="space-y-2 lg:space-y-3 h-full flex flex-col">
                     {/* Form Fields Container - Flexible height */}
                     <div className="flex-1 space-y-2 lg:space-y-3">
@@ -274,18 +391,48 @@ export default function ContactsPage() {
                       </div>
 
                       {/* reCAPTCHA - Fixed height */}
-                      <div className="w-full flex justify-center py-2">
-                        <div className="w-max bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
+                      <div className="w-full py-2">
+                        <div className="w-max mx-auto bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
                           <ReCAPTCHA
+                            ref={recaptchaRef}
                             sitekey={
                               process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
                               "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
                             }
                             onChange={handleRecaptchaChange}
+                            onExpired={handleRecaptchaExpired}
+                            onErrored={handleRecaptchaError}
                             theme="light"
                             size="normal"
                           />
                         </div>
+                        {recaptchaError && (
+                          <div className="mt-2 text-xs text-red-600 font-medium text-center">
+                            {recaptchaError}
+                          </div>
+                        )}
+                        {isRecaptchaExpired && !isWithinGracePeriod() && (
+                          <div className="mt-2 text-xs text-amber-600 font-medium text-center">
+                            reCAPTCHA expired. It will be refreshed
+                            automatically when you submit.
+                          </div>
+                        )}
+                        {isWithinGracePeriod() && !recaptchaToken && (
+                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
+                            ✓ Verified - You can make changes for{" "}
+                            {Math.ceil(
+                              (RECAPTCHA_GRACE_PERIOD -
+                                (Date.now() - (recaptchaVerifiedAt || 0))) /
+                                1000
+                            )}{" "}
+                            more seconds
+                          </div>
+                        )}
+                        {recaptchaToken && (
+                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
+                            ✓ reCAPTCHA verified
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -293,12 +440,18 @@ export default function ContactsPage() {
                     <div className="pt-2 px-4 flex-shrink-0">
                       <button
                         type="submit"
-                        disabled={isSubmitting || !recaptchaToken}
+                        disabled={isSubmitting || !isValid || !recaptchaToken}
                         className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-inter font-extrabold text-base lg:text-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         style={{ color: "#5741FF" }}
                       >
                         {isSubmitting ? "Submitting..." : "Submit"}
                       </button>
+                      {/* Helper text for disabled state */}
+                      {!recaptchaToken && dirty && (
+                        <p className="mt-2 text-xs text-gray-600 text-center">
+                          Please complete the reCAPTCHA to submit
+                        </p>
+                      )}
                     </div>
                   </Form>
                 )}
@@ -306,6 +459,7 @@ export default function ContactsPage() {
             </div>
           </div>
         </div>
+
         <div className="absolute bottom-4 left-6 sm:bottom-6 sm:left-8 md:bottom-8 md:left-10 lg:bottom-4 lg:left-6 xl:bottom-6 xl:left-8 flex items-center space-x-4 sm:space-x-5 lg:space-x-4 xl:space-x-5">
           <button className="hover:opacity-80 transition-opacity">
             <Image
