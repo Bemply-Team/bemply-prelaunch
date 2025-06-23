@@ -11,6 +11,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 import { apiService, type WaitlistData } from "@/services/api";
 import { storageService } from "@/services/storage";
+import { useWaitlist } from "@/context/waitlist-context";
 
 // Validation schema
 const WaitlistSchema = Yup.object().shape({
@@ -47,6 +48,7 @@ interface ToastState {
 
 export default function WaitlistPage() {
   const router = useRouter();
+  const { refreshWaitlistData } = useWaitlist();
   const [toast, setToast] = useState<ToastState>({
     show: false,
     type: "success",
@@ -187,12 +189,7 @@ export default function WaitlistPage() {
         // Store waitlist data in localStorage
         storageService.storeWaitlistData(values);
 
-        // Update waitlist status if provided
-        if (response.percentage !== undefined) {
-          const currentStatus = storageService.getWaitlistStatus();
-          const count = currentStatus?.count || 0;
-          storageService.storeWaitlistStatus(response.percentage, count + 1);
-        }
+        await refreshWaitlistData();
 
         // Reset reCAPTCHA and clear grace period
         recaptchaRef.current?.reset();

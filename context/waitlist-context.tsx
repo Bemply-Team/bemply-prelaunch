@@ -1,14 +1,22 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { apiService } from "@/services/api"
-import { storageService } from "@/services/storage"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { apiService, type WaitlistSubmission } from "@/services/api";
+import { storageService } from "@/services/storage";
 
 interface WaitlistContextType {
-  isComplete: boolean
-  percentage: number
-  count: number
-  isLoading: boolean
+  isComplete: boolean;
+  percentage: number;
+  count: number;
+  isLoading: boolean;
+  submissions: WaitlistSubmission[];
+  refreshWaitlistData: () => Promise<void>;
 }
 
 const WaitlistContext = createContext<WaitlistContextType>({
@@ -16,9 +24,11 @@ const WaitlistContext = createContext<WaitlistContextType>({
   percentage: 0,
   count: 0,
   isLoading: true,
-})
+  submissions: [],
+  refreshWaitlistData: async () => {},
+});
 
-export const useWaitlist = () => useContext(WaitlistContext)
+export const useWaitlist = () => useContext(WaitlistContext);
 
 export const WaitlistProvider = ({ children }: { children: ReactNode }) => {
   const [status, setStatus] = useState<WaitlistContextType>({
@@ -26,43 +36,62 @@ export const WaitlistProvider = ({ children }: { children: ReactNode }) => {
     percentage: 0,
     count: 0,
     isLoading: true,
-  })
+    submissions: [],
+    refreshWaitlistData: async () => {},
+  });
+
+  const checkWaitlistStatus = async () => {
+    try {
+      // First check localStorage for cached data
+      const cachedStatus = storageService.getWaitlistStatus();
+      if (cachedStatus) {
+        setStatus((prev) => ({
+          ...prev,
+          isComplete: cachedStatus.percentage >= 100,
+          percentage: cachedStatus.percentage,
+          count: cachedStatus.count,
+          isLoading: false,
+          submissions: [], // We don't cache submissions, only get fresh data
+        }));
+      }
+
+      // Then fetch fresh data
+      const freshStatus = await apiService.getWaitlistStatus();
+
+      // Store updated status
+      storageService.storeWaitlistStatus(
+        freshStatus.percentage,
+        freshStatus.count
+      );
+
+      setStatus((prev) => ({
+        ...prev,
+        isComplete: freshStatus.percentage >= 100,
+        percentage: freshStatus.percentage,
+        count: freshStatus.count,
+        isLoading: false,
+        submissions: freshStatus.submissions,
+      }));
+    } catch (error) {
+      console.error("Failed to load waitlist status:", error);
+      // Keep cached data or default to loading state
+      setStatus((prev) => ({ ...prev, isLoading: false }));
+    }
+  };
+  useEffect(() => {
+    checkWaitlistStatus();
+  }, []);
 
   useEffect(() => {
-    const checkWaitlistStatus = async () => {
-      try {
-        // First check localStorage for cached data
-        const cachedStatus = storageService.getWaitlistStatus()
-        if (cachedStatus) {
-          setStatus({
-            isComplete: cachedStatus.percentage >= 100,
-            percentage: cachedStatus.percentage,
-            count: cachedStatus.count,
-            isLoading: false,
-          })
-        }
+    setStatus((prev) => ({
+      ...prev,
+      refreshWaitlistData: checkWaitlistStatus,
+    }));
+  }, []);
 
-        // Then fetch fresh data
-        const freshStatus = await apiService.getWaitlistStatus()
-
-        // Store updated status
-        storageService.storeWaitlistStatus(freshStatus.percentage, freshStatus.count)
-
-        setStatus({
-          isComplete: freshStatus.percentage >= 100,
-          percentage: freshStatus.percentage,
-          count: freshStatus.count,
-          isLoading: false,
-        })
-      } catch (error) {
-        console.error("Failed to load waitlist status:", error)
-        // Keep cached data or default to loading state
-        setStatus((prev) => ({ ...prev, isLoading: false }))
-      }
-    }
-
-    checkWaitlistStatus()
-  }, [])
-
-  return <WaitlistContext.Provider value={status}>{children}</WaitlistContext.Provider>
-}
+  return (
+    <WaitlistContext.Provider value={status}>
+      {children}
+    </WaitlistContext.Provider>
+  );
+};

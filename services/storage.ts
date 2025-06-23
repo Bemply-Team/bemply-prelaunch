@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
 
 export interface StoredWaitlistData extends WaitlistData {
   joinedAt: string;
+  company: string;
   id: string;
 }
 
@@ -28,18 +29,18 @@ class StorageService {
       id: this.generateId(),
     };
 
-    localStorage.setItem(
+    sessionStorage.setItem(
       STORAGE_KEYS.WAITLIST_DATA,
       JSON.stringify(storedData)
     );
-    localStorage.setItem(STORAGE_KEYS.USER_JOINED, "true");
+    sessionStorage.setItem(STORAGE_KEYS.USER_JOINED, "true");
   }
 
   // Get stored waitlist data
   getWaitlistData(): StoredWaitlistData | null {
     if (typeof window === "undefined") return null;
 
-    const data = localStorage.getItem(STORAGE_KEYS.WAITLIST_DATA);
+    const data = sessionStorage.getItem(STORAGE_KEYS.WAITLIST_DATA);
     return data ? JSON.parse(data) : null;
   }
 
@@ -67,7 +68,7 @@ class StorageService {
   } | null {
     if (typeof window === "undefined") return null;
 
-    const status = localStorage.getItem(STORAGE_KEYS.WAITLIST_STATUS);
+    const status = sessionStorage.getItem(STORAGE_KEYS.WAITLIST_STATUS);
     return status ? JSON.parse(status) : null;
   }
 
@@ -76,7 +77,7 @@ class StorageService {
     if (typeof window === "undefined") return;
 
     Object.values(STORAGE_KEYS).forEach((key) => {
-      localStorage.removeItem(key);
+      sessionStorage.removeItem(key);
     });
   }
 

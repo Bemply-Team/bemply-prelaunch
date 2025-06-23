@@ -17,12 +17,26 @@ export interface ContactData {
   message: string;
 }
 
+// Add new types for the real API response
+export interface WaitlistSubmission {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  company: string;
+  position: string;
+  industry: string;
+}
 export interface WaitlistResponse {
   success: boolean;
   message: string;
   percentage?: number;
 }
 
+export interface WaitlistApiResponse {
+  data: WaitlistSubmission[];
+  count: number;
+}
 export interface ContactResponse {
   success: boolean;
   message: string;
@@ -32,33 +46,48 @@ export interface WaitlistStatusResponse {
   percentage: number;
   count: number;
   isComplete: boolean;
+  submissions: WaitlistSubmission[];
 }
 
 class ApiService {
-  private baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.bemply.com";
+  private baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   // Get waitlist status and percentage
   async getWaitlistStatus(): Promise<WaitlistStatusResponse> {
     try {
-      // Mock response - replace with real API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await fetch(`${this.baseUrl}/waitlist`);
 
-      // Mock different scenarios for testing
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const apiResponse: WaitlistApiResponse = await response.json();
+
+      // Calculate percentage out of 300 submissions
+      const percentage = Math.min(
+        Math.round((apiResponse.count / 300) * 100),
+        100
+      );
+
+      return {
+        percentage,
+        count: apiResponse.count,
+        isComplete: percentage >= 100,
+        submissions: apiResponse.data,
+      };
+    } catch (error) {
+      console.error("Failed to get waitlist status:", error);
+
+      // Fallback to mock data if API fails
       const mockPercentage =
         Math.random() > 0.8 ? 100 : Math.floor(Math.random() * 95) + 1;
 
       return {
         percentage: mockPercentage,
-        count: Math.floor((mockPercentage / 100) * 150), // Mock total count
+        count: Math.floor((mockPercentage / 100) * 300),
         isComplete: mockPercentage >= 100,
+        submissions: [],
       };
-
-      // Real API call would be:
-      // const response = await fetch(`${this.baseUrl}/waitlist/status`)
-      // return await response.json()
-    } catch (error) {
-      console.error("Failed to get waitlist status:", error);
-      return { percentage: 0, count: 0, isComplete: false };
     }
   }
 
@@ -80,7 +109,12 @@ class ApiService {
           message: responseData[errorKeys[0]],
         };
       }
-      return { success: true, message: "Successfully joined the waitlist." };
+      const updatedStatus = await this.getWaitlistStatus();
+      return {
+        success: true,
+        percentage: updatedStatus.percentage,
+        message: "Successfully joined the waitlist.",
+      };
     } catch (error) {
       console.error("Failed to submit waitlist:", error);
       return {
