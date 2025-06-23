@@ -439,8 +439,8 @@ export default function WaitlistPage() {
                           <ReCAPTCHA
                             ref={recaptchaRef}
                             sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
-                              "6LforlMrAAAAAB7QP6_CWsS6cVWccpx1REba3Ise"
+                              process.env
+                                .NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string
                             }
                             onChange={handleRecaptchaChange}
                             onExpired={handleRecaptchaExpired}

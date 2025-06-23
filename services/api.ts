@@ -10,10 +10,10 @@ export interface WaitlistData {
 }
 
 export interface ContactData {
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  companyName: string;
+  company: string;
   message: string;
 }
 

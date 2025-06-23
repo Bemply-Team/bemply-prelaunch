@@ -12,18 +12,18 @@ import { apiService, type ContactData } from "@/services/api";
 
 // Validation schema
 const ContactSchema = Yup.object().shape({
-  firstName: Yup.string()
+  first_name: Yup.string()
     .min(2, "First name must be at least 2 characters")
     .max(50, "First name must be less than 50 characters")
     .required("First name is required"),
-  lastName: Yup.string()
+  last_name: Yup.string()
     .min(2, "Last name must be at least 2 characters")
     .max(50, "Last name must be less than 50 characters")
     .required("Last name is required"),
   email: Yup.string()
     .email("Please enter a valid email address")
     .required("Email address is required"),
-  companyName: Yup.string()
+  company: Yup.string()
     .min(2, "Company name must be at least 2 characters")
     .max(100, "Company name must be less than 100 characters")
     .required("Company name is required"),
@@ -244,10 +244,10 @@ export default function ContactsPage() {
             <div className="flex-1 min-h-0">
               <Formik
                 initialValues={{
-                  firstName: "",
-                  lastName: "",
+                  first_name: "",
+                  last_name: "",
                   email: "",
-                  companyName: "",
+                  company: "",
                   message: "",
                 }}
                 validationSchema={ContactSchema}
@@ -268,17 +268,17 @@ export default function ContactsPage() {
                           </label>
                           <Field
                             type="text"
-                            id="firstName"
-                            name="firstName"
+                            id="first_name"
+                            name="first_name"
                             placeholder="Jane"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.firstName && touched.firstName
+                              errors.first_name && touched.first_name
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="firstName"
+                            name="first_name"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -286,24 +286,24 @@ export default function ContactsPage() {
 
                         <div>
                           <label
-                            htmlFor="lastName"
+                            htmlFor="last_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Last name
                           </label>
                           <Field
                             type="text"
-                            id="lastName"
-                            name="lastName"
+                            id="last_name"
+                            name="last_name"
                             placeholder="Smitherton"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.lastName && touched.lastName
+                              errors.last_name && touched.last_name
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="lastName"
+                            name="last_name"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -339,24 +339,24 @@ export default function ContactsPage() {
 
                         <div>
                           <label
-                            htmlFor="companyName"
+                            htmlFor="company"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
                             Company Name
                           </label>
                           <Field
                             type="text"
-                            id="companyName"
-                            name="companyName"
+                            id="company"
+                            name="company"
                             placeholder="FakeDomain"
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                              errors.companyName && touched.companyName
+                              errors.company && touched.company
                                 ? "border-red-400 focus:border-red-500"
                                 : "border-white/50 focus:border-blue-400"
                             }`}
                           />
                           <ErrorMessage
-                            name="companyName"
+                            name="company"
                             component="div"
                             className="mt-1 text-xs text-red-600 font-medium"
                           />
@@ -396,8 +396,8 @@ export default function ContactsPage() {
                           <ReCAPTCHA
                             ref={recaptchaRef}
                             sitekey={
-                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
-                              "6LforlMrAAAAAB7QP6_CWsS6cVWccpx1REba3Ise"
+                              process.env
+                                .NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string
                             }
                             onChange={handleRecaptchaChange}
                             onExpired={handleRecaptchaExpired}
