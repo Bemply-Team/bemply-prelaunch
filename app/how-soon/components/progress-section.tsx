@@ -31,21 +31,21 @@ export default function ProgressSection() {
       {/* Company Logos and Text - Stacked horizontally with optimized spacing */}
       <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-4 xl:space-x-5">
         <div className="flex items-center -space-x-1">
-          {submissions &&
-            submissions.length &&
-            submissions
-              .slice(0, myWaitlistData?.company ? 3 : 4)
-              .map((submission, index) => (
-                <CompanyAvatar
-                  key={submission.id}
-                  companyName={submission.company}
-                  size="md"
-                  className={`relative z-${
-                    10 + index * 10
-                  } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
-                />
-              ))}
-          {myWaitlistData && (
+          {submissions && submissions.length
+            ? submissions
+                .slice(0, myWaitlistData?.company ? 3 : 4)
+                .map((submission, index) => (
+                  <CompanyAvatar
+                    key={submission.id}
+                    companyName={submission.company}
+                    size="md"
+                    className={`relative z-${
+                      10 + index * 10
+                    } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
+                  />
+                ))
+            : null}
+          {myWaitlistData ? (
             <CompanyAvatar
               key={myWaitlistData.id}
               companyName={myWaitlistData.company}
@@ -54,7 +54,7 @@ export default function ProgressSection() {
                 10 + 4 * 10
               } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
             />
-          )}
+          ) : null}
           {/* Show placeholder avatars if we have less than 4 submissions */}
           {submissions.length < 4 &&
             Array.from({ length: 4 - submissions.length }).map((_, index) => (
