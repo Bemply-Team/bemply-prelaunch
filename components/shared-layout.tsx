@@ -25,7 +25,7 @@ export default function SharedLayout({
       case "form":
         return `${baseClasses} max-w-sm sm:max-w-md md:max-w-4xl lg:max-w-5xl xl:max-w-6xl p-5 sm:p-6 md:p-8 lg:p-6 xl:p-8 pb-3 sm:pb-4 md:pb-6 lg:pb-4 xl:pb-6 min-h-[600px] sm:min-h-[650px] md:min-h-[700px] lg:min-h-[600px] xl:min-h-[650px]`;
       case "compact":
-        return `${baseClasses} max-w-sm sm:max-w-md md:max-w-4xl lg:max-w-5xl xl:max-w-6xl p-6 sm:p-8 md:p-10 lg:p-8 xl:p-12 pb-4 sm:pb-6 md:pb-8 lg:pb-6 xl:pb-8 h-[85vh] lg:h-[80vh] flex flex-col`;
+        return `${baseClasses}  lg:max-w-5xl xl:max-w-6xl p-6 sm:p-8 md:p-10 lg:p-8 xl:p-12 pb-4 sm:pb-6 md:pb-8 lg:pb-6 xl:pb-8 h-[80vh]  md:h-[700px] lg:h-[600px] xl:h-[650px] flex flex-col`;
       default:
         return `${baseClasses} max-w-sm sm:max-w-md md:max-w-3xl lg:max-w-5xl xl:max-w-6xl p-8 sm:p-10 md:p-12 lg:p-10 xl:p-12 pb-6 sm:pb-8 md:pb-10 lg:pb-6 xl:pb-8 min-h-[500px] sm:min-h-[550px] md:min-h-[600px] lg:min-h-[480px] xl:min-h-[520px]`;
     }
