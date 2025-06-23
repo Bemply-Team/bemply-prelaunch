@@ -397,7 +397,7 @@ export default function ContactsPage() {
                             ref={recaptchaRef}
                             sitekey={
                               process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
-                              "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                              "6LforlMrAAAAAB7QP6_CWsS6cVWccpx1REba3Ise"
                             }
                             onChange={handleRecaptchaChange}
                             onExpired={handleRecaptchaExpired}
@@ -426,11 +426,6 @@ export default function ContactsPage() {
                                 1000
                             )}{" "}
                             more seconds
-                          </div>
-                        )}
-                        {recaptchaToken && (
-                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
-                            ✓ reCAPTCHA verified
                           </div>
                         )}
                       </div>

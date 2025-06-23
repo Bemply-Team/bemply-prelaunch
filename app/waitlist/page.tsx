@@ -438,7 +438,10 @@ export default function WaitlistPage() {
                         <div className="w-max mx-auto bg-white/80 backdrop-blur-sm rounded-lg p-2 flex justify-center">
                           <ReCAPTCHA
                             ref={recaptchaRef}
-                            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                            sitekey={
+                              process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
+                              "6LforlMrAAAAAB7QP6_CWsS6cVWccpx1REba3Ise"
+                            }
                             onChange={handleRecaptchaChange}
                             onExpired={handleRecaptchaExpired}
                             onErrored={handleRecaptchaError}
