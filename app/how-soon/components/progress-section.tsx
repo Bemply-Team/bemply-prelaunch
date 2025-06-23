@@ -1,8 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { apiService } from "@/services/api";
 import { storageService } from "@/services/storage";
 import { useWaitlist } from "@/context/waitlist-context";
 import CompanyAvatar from "@/components/company-avatar";
