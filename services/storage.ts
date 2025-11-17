@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   WAITLIST_DATA: "bemply_waitlist_data",
   WAITLIST_STATUS: "bemply_waitlist_status",
   USER_JOINED: "bemply_user_joined",
+  LANGUAGE_PREFERENCE: "bemply_language_preference",
 } as const;
 
 export interface StoredWaitlistData extends WaitlistData {
@@ -71,6 +72,25 @@ class StorageService {
     const status = sessionStorage.getItem(STORAGE_KEYS.WAITLIST_STATUS);
     return status ? JSON.parse(status) : null;
   }
+  // Store language preference (persist between sessions)
+  storeLanguagePreference(language: string): void {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.LANGUAGE_PREFERENCE, language);
+    } catch {
+      // Ignore if localStorage is unavailable or blocked
+    }
+  }
+
+  // Get stored language preference
+  getLanguagePreference(): string | null {
+    if (typeof window === "undefined") return null;
+    try {
+      return localStorage.getItem(STORAGE_KEYS.LANGUAGE_PREFERENCE);
+    } catch {
+      return null;
+    }
+  }
 
   // Clear all stored data (for testing/reset)
   clearAllData(): void {
@@ -78,6 +98,11 @@ class StorageService {
 
     Object.values(STORAGE_KEYS).forEach((key) => {
       sessionStorage.removeItem(key);
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // Ignore if localStorage is unavailable
+      }
     });
   }
 

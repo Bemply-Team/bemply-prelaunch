@@ -1,26 +1,28 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { X, CheckCircle, XCircle } from "lucide-react"
+import { useEffect } from "react";
+import { X, CheckCircle, XCircle } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 interface ToastProps {
-  show: boolean
-  type: "success" | "error"
-  message: string
-  onClose: () => void
+  show: boolean;
+  type: "success" | "error";
+  message: string;
+  onClose: () => void;
 }
 
 export default function Toast({ show, type, message, onClose }: ToastProps) {
+  const { t } = useLanguage();
   useEffect(() => {
     if (show) {
       const timer = setTimeout(() => {
-        onClose()
-      }, 5000)
-      return () => clearTimeout(timer)
+        onClose();
+      }, 5000);
+      return () => clearTimeout(timer);
     }
-  }, [show, onClose])
+  }, [show, onClose]);
 
-  if (!show) return null
+  if (!show) return null;
 
   return (
     <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2 duration-300">
@@ -34,8 +36,12 @@ export default function Toast({ show, type, message, onClose }: ToastProps) {
             )}
           </div>
           <div className="flex-1">
-            <p className={`text-sm font-medium ${type === "success" ? "text-green-800" : "text-red-800"}`}>
-              {type === "success" ? "Success!" : "Error!"}
+            <p
+              className={`text-sm font-medium ${
+                type === "success" ? "text-green-800" : "text-red-800"
+              }`}
+            >
+              {type === "success" ? t("common.success") : t("common.error")}
             </p>
             <p className="text-sm text-gray-700 mt-1">{message}</p>
           </div>
@@ -48,5 +54,5 @@ export default function Toast({ show, type, message, onClose }: ToastProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

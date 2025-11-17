@@ -3,10 +3,12 @@
 import { storageService } from "@/services/storage";
 import { useWaitlist } from "@/context/waitlist-context";
 import CompanyAvatar from "@/components/company-avatar";
+import { useLanguage } from "@/context/language-context";
 
 export default function ProgressSection() {
   const { percentage: progress, count, submissions } = useWaitlist();
   const myWaitlistData = storageService.getWaitlistData();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:pb-20 lg:space-y-4 xl:space-y-5 max-w-sm sm:max-w-md md:max-w-lg mx-auto px-6 sm:px-8">
@@ -66,7 +68,7 @@ export default function ProgressSection() {
             ))}
         </div>
         <span className="font-montserrat font-semibold text-base sm:text-sm lg:text-base xl:text-sm text-gray-700 text-center">
-          Join {count}+ others on the waitlist
+          {t("howSoon.waitlistCount", { count: count.toString() })}
         </span>
       </div>
     </div>

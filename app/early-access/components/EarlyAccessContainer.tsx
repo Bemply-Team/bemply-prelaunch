@@ -1,16 +1,17 @@
 "use client";
 
-import SharedLayout from "@/components/shared-layout";
 import SharedNavigation from "@/components/shared-navigation";
 import SocialIcons from "../components/social-icons";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useWaitlist } from "@/context/waitlist-context";
 import { useEffect } from "react";
+import { useLanguage } from "@/context/language-context";
 
 export default function EarlyAccessPageContainer() {
   const router = useRouter();
   const { isComplete, isLoading } = useWaitlist();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!isLoading) {
@@ -51,7 +52,7 @@ export default function EarlyAccessPageContainer() {
             className="font-jeju text-2xl xs:text-2xl sm:text-3xl md:text-4xl  font-normal"
             style={{ color: "#8B7CF6", letterSpacing: "0.1em" }}
           >
-            The Platform Awaits You
+            {t("earlyAccess.heading")}
           </h1>
 
           {/* Subtitle - Using Cousine */}
@@ -59,9 +60,7 @@ export default function EarlyAccessPageContainer() {
             className="font-cousine text-base md:text-lg xl:text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed px-6 sm:px-8 lg:px-10"
             style={{ letterSpacing: "0.1em" }}
           >
-            Ready ? Get Familiar With Bemply and All
-            <br />
-            Its Features.
+            {t("earlyAccess.description")}
           </p>
 
           {/* Early Access Button */}
@@ -73,14 +72,14 @@ export default function EarlyAccessPageContainer() {
               {/* Inner pill - EARLY ACCESS */}
               <div className="bg-white/90 backdrop-blur-md rounded-full px-3 py-2  md:px-4 md:py-3  mr-4 shadow-sm">
                 <span className="font-sans flex items-center justify-center font-bold text-[10px] sm:text-xs md:text-base text-teal-700">
-                  EARLY ACCESS
+                  {t("earlyAccess.title")}
                 </span>
               </div>
 
               {/* Get started text and arrow */}
               <div className="flex items-center justify-center pr-2">
                 <span className="font-sans font-medium text-[10px] sm:text-xs md:text-base text-white mr-3">
-                  Get started
+                  {t("common.getStarted")}
                 </span>
                 <svg
                   className="w-5 h-5 sm:w-6 sm:h-6 text-white"
@@ -101,10 +100,9 @@ export default function EarlyAccessPageContainer() {
         </div>
 
         {/* Bottom Section - Fixed height */}
-        <div className="text-center mt-4 md:mt-0 ">
-          <p className="font-ag font-bold text-sm sm:text-base lg:text-base xl:text-lg text-gray-700">
-            We Have a Little Gift For You : 1 Month Free Trial for Early
-            Sign-Ups
+        <div className="text-center mt-4 md:mt-0 mb-16 sm:mb-20 md:mb-16 lg:mb-12">
+          <p className="font-ag font-bold text-sm sm:text-base lg:text-base xl:text-lg text-gray-700 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16">
+            {t("earlyAccess.gift")}
           </p>
         </div>
       </div>

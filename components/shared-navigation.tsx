@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useWaitlist } from "@/context/waitlist-context";
+import { useLanguage } from "@/context/language-context";
 import MobileMenu from "@/app/how-soon/components/mobile-menu";
 
 interface SharedNavigationProps {
@@ -19,6 +20,7 @@ export default function SharedNavigation({
 }: SharedNavigationProps) {
   const pathname = usePathname();
   const { isComplete } = useWaitlist();
+  const { t } = useLanguage();
 
   // Determine the home page based on waitlist status
   const homePage = isComplete ? "/early-access" : "/how-soon";
@@ -32,7 +34,7 @@ export default function SharedNavigation({
   };
 
   // Determine the text for the home page link
-  const homeText = isComplete ? "Early Access" : "How Soon";
+  const homeText = isComplete ? t("nav.earlyAccess") : t("nav.howSoon");
 
   return (
     <nav
@@ -48,10 +50,10 @@ export default function SharedNavigation({
       {logoPosition === "center" ? (
         <div className="hidden md:flex w-full justify-between items-center">
           {/* Left Navigation Items */}
-          <div className="flex space-x-8 lg:space-x-12 xl:space-x-14">
+          <div className="flex space-x-4 lg:space-x-6 xl:space-x-8">
             <Link
               href={homePage}
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive(homePage)
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
@@ -61,60 +63,60 @@ export default function SharedNavigation({
             </Link>
             <Link
               href="/features"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/features")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              Features
+              {t("nav.features")}
             </Link>
           </div>
 
           {/* Center Logo */}
           {showLogo && (
-            <div className="flex justify-center">
+            <div className="flex justify-center flex-shrink-0 mx-4">
               <Image
                 src="/bemply-logo.png"
                 alt="Bemply Logo"
                 width={200}
                 height={60}
-                className="h-12 lg:h-14 xl:h-16 w-auto"
+                className="h-10 lg:h-12 xl:h-14 w-auto"
                 priority
               />
             </div>
           )}
 
           {/* Right Navigation Items */}
-          <div className="flex space-x-8 lg:space-x-12 xl:space-x-14">
+          <div className="flex space-x-4 lg:space-x-6 xl:space-x-8">
             <Link
               href="/about"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/about")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              About
+              {t("nav.about")}
             </Link>
             <Link
               href="/contacts"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/contacts")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              Contacts
+              {t("nav.contacts")}
             </Link>
           </div>
         </div>
       ) : (
         <div className="hidden md:flex w-full justify-between items-center">
-          <div className="flex space-x-8 lg:space-x-12 xl:space-x-14">
+          <div className="flex space-x-4 lg:space-x-6 xl:space-x-8">
             <Link
               href={homePage}
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive(homePage)
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
@@ -124,35 +126,35 @@ export default function SharedNavigation({
             </Link>
             <Link
               href="/features"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/features")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              Features
+              {t("nav.features")}
             </Link>
           </div>
-          <div className="flex space-x-8 lg:space-x-12 xl:space-x-14">
+          <div className="flex space-x-4 lg:space-x-6 xl:space-x-8">
             <Link
               href="/about"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/about")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              About
+              {t("nav.about")}
             </Link>
             <Link
               href="/contacts"
-              className={`font-josefin font-medium text-base lg:text-lg xl:text-xl ${
+              className={`font-josefin font-medium text-sm lg:text-base xl:text-lg whitespace-nowrap ${
                 isActive("/contacts")
                   ? "text-eagle border-b-[3px] border-eagle pb-1"
                   : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
               }`}
             >
-              Contacts
+              {t("nav.contacts")}
             </Link>
           </div>
         </div>
@@ -164,10 +166,10 @@ export default function SharedNavigation({
           <MobileMenu isEarlyAccess={isComplete} />
         </div>
       ) : (
-        <div className="md:hidden w-full flex justify-center space-x-6">
+        <div className="md:hidden w-full flex justify-center space-x-3 sm:space-x-4">
           <Link
             href={homePage}
-            className={`font-josefin font-medium text-sm ${
+            className={`font-josefin font-medium text-xs sm:text-sm whitespace-nowrap ${
               isActive(homePage)
                 ? "text-eagle border-b-[3px] border-eagle pb-1"
                 : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
@@ -177,33 +179,33 @@ export default function SharedNavigation({
           </Link>
           <Link
             href="/features"
-            className={`font-josefin font-medium text-sm ${
+            className={`font-josefin font-medium text-xs sm:text-sm whitespace-nowrap ${
               isActive("/features")
                 ? "text-eagle border-b-[3px] border-eagle pb-1"
                 : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
             }`}
           >
-            Features
+            {t("nav.features")}
           </Link>
           <Link
             href="/about"
-            className={`font-josefin font-medium text-sm ${
+            className={`font-josefin font-medium text-xs sm:text-sm whitespace-nowrap ${
               isActive("/about")
                 ? "text-eagle border-b-[3px] border-eagle pb-1"
                 : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
             }`}
           >
-            About
+            {t("nav.about")}
           </Link>
           <Link
             href="/contacts"
-            className={`font-josefin font-medium text-sm ${
+            className={`font-josefin font-medium text-xs sm:text-sm whitespace-nowrap ${
               isActive("/contacts")
                 ? "text-eagle border-b-[3px] border-eagle pb-1"
                 : "text-eagle opacity-[42%] hover:opacity-100 hover:text-eagle transition-colors"
             }`}
           >
-            Contacts
+            {t("nav.contacts")}
           </Link>
         </div>
       )}

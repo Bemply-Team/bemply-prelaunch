@@ -9,29 +9,7 @@ import Toast from "./components/toast";
 import ReCAPTCHA from "react-google-recaptcha";
 import Image from "next/image";
 import { apiService, type ContactData } from "@/services/api";
-
-// Validation schema
-const ContactSchema = Yup.object().shape({
-  first_name: Yup.string()
-    .min(2, "First name must be at least 2 characters")
-    .max(50, "First name must be less than 50 characters")
-    .required("First name is required"),
-  last_name: Yup.string()
-    .min(2, "Last name must be at least 2 characters")
-    .max(50, "Last name must be less than 50 characters")
-    .required("Last name is required"),
-  email: Yup.string()
-    .email("Please enter a valid email address")
-    .required("Email address is required"),
-  company: Yup.string()
-    .min(2, "Company name must be at least 2 characters")
-    .max(100, "Company name must be less than 100 characters")
-    .required("Company name is required"),
-  message: Yup.string()
-    .min(10, "Message must be at least 10 characters")
-    .max(1000, "Message must be less than 1000 characters")
-    .required("Message is required"),
-});
+import { useLanguage } from "@/context/language-context";
 
 interface ToastState {
   show: boolean;
@@ -40,6 +18,7 @@ interface ToastState {
 }
 
 export default function ContactsPage() {
+  const { t } = useLanguage();
   const [toast, setToast] = useState<ToastState>({
     show: false,
     type: "success",
@@ -55,6 +34,29 @@ export default function ContactsPage() {
 
   // 1 minute grace period in milliseconds
   const RECAPTCHA_GRACE_PERIOD = 60 * 1000;
+
+  // Validation schema with translations
+  const ContactSchema = Yup.object().shape({
+    first_name: Yup.string()
+      .min(2, t("contacts.validation.firstNameMin"))
+      .max(50, t("contacts.validation.firstNameMax"))
+      .required(t("contacts.validation.firstNameRequired")),
+    last_name: Yup.string()
+      .min(2, t("contacts.validation.lastNameMin"))
+      .max(50, t("contacts.validation.lastNameMax"))
+      .required(t("contacts.validation.lastNameRequired")),
+    email: Yup.string()
+      .email(t("contacts.validation.emailInvalid"))
+      .required(t("contacts.validation.emailRequired")),
+    company: Yup.string()
+      .min(2, t("contacts.validation.companyMin"))
+      .max(100, t("contacts.validation.companyMax"))
+      .required(t("contacts.validation.companyRequired")),
+    message: Yup.string()
+      .min(10, t("contacts.validation.messageMin"))
+      .max(1000, t("contacts.validation.messageMax"))
+      .required(t("contacts.validation.messageRequired")),
+  });
 
   const showToast = (type: "success" | "error", message: string) => {
     setToast({ show: true, type, message });
@@ -163,9 +165,7 @@ export default function ContactsPage() {
 
       // If still no token, show error but allow manual completion
       if (!validToken) {
-        setRecaptchaError(
-          "Please complete the reCAPTCHA verification before submitting."
-        );
+        setRecaptchaError(t("contacts.recaptchaRequired"));
         setSubmitting(false);
         return;
       }
@@ -192,7 +192,7 @@ export default function ContactsPage() {
           response.message?.toLowerCase().includes("recaptcha") ||
           response.message?.toLowerCase().includes("captcha")
         ) {
-          setRecaptchaError("reCAPTCHA verification failed. Please try again.");
+          setRecaptchaError(t("contacts.recaptchaFailed"));
           recaptchaRef.current?.reset();
           setRecaptchaToken(null);
           setIsRecaptchaExpired(false);
@@ -202,10 +202,7 @@ export default function ContactsPage() {
       }
     } catch (error) {
       // On network errors, don't reset reCAPTCHA to avoid frustrating user
-      showToast(
-        "error",
-        "An unexpected error occurred. Please try again later."
-      );
+      showToast("error", t("contacts.errorMessage"));
     } finally {
       setSubmitting(false);
     }
@@ -236,7 +233,7 @@ export default function ContactsPage() {
                 className="font-cousine font-bold text-lg sm:text-xl md:text-2xl lg:text-2xl xl:text-3xl text-center"
                 style={{ color: "#5741FF" }}
               >
-                Any Questions ? Contact Us
+                {t("contacts.title")}
               </h1>
             </div>
 
@@ -264,13 +261,13 @@ export default function ContactsPage() {
                             htmlFor="firstName"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            First name
+                            {t("contacts.firstName")}
                           </label>
                           <Field
                             type="text"
                             id="first_name"
                             name="first_name"
-                            placeholder="Jane"
+                            placeholder={t("contacts.firstNamePlaceholder")}
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                               errors.first_name && touched.first_name
                                 ? "border-red-400 focus:border-red-500"
@@ -289,13 +286,13 @@ export default function ContactsPage() {
                             htmlFor="last_name"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            Last name
+                            {t("contacts.lastName")}
                           </label>
                           <Field
                             type="text"
                             id="last_name"
                             name="last_name"
-                            placeholder="Smitherton"
+                            placeholder={t("contacts.lastNamePlaceholder")}
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                               errors.last_name && touched.last_name
                                 ? "border-red-400 focus:border-red-500"
@@ -317,13 +314,13 @@ export default function ContactsPage() {
                             htmlFor="email"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            Email address
+                            {t("contacts.email")}
                           </label>
                           <Field
                             type="email"
                             id="email"
                             name="email"
-                            placeholder="email@janesfakedomain.net"
+                            placeholder={t("contacts.emailPlaceholder")}
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                               errors.email && touched.email
                                 ? "border-red-400 focus:border-red-500"
@@ -342,13 +339,13 @@ export default function ContactsPage() {
                             htmlFor="company"
                             className="block text-sm font-medium text-gray-700 mb-1"
                           >
-                            Company Name
+                            {t("contacts.companyName")}
                           </label>
                           <Field
                             type="text"
                             id="company"
                             name="company"
-                            placeholder="FakeDomain"
+                            placeholder={t("contacts.companyNamePlaceholder")}
                             className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
                               errors.company && touched.company
                                 ? "border-red-400 focus:border-red-500"
@@ -369,14 +366,14 @@ export default function ContactsPage() {
                           htmlFor="message"
                           className="block text-sm font-medium text-gray-700 mb-1"
                         >
-                          Your message
+                          {t("contacts.message")}
                         </label>
                         <Field
                           as="textarea"
                           id="message"
                           name="message"
                           rows={3}
-                          placeholder="Enter your question or message"
+                          placeholder={t("contacts.messagePlaceholder")}
                           className={`w-full px-3 py-2 lg:px-4 lg:py-3 rounded-lg border-2 bg-white/80 backdrop-blur-sm font-ag text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 resize-none ${
                             errors.message && touched.message
                               ? "border-red-400 focus:border-red-500"
@@ -413,19 +410,19 @@ export default function ContactsPage() {
                         )}
                         {isRecaptchaExpired && !isWithinGracePeriod() && (
                           <div className="mt-2 text-xs text-amber-600 font-medium text-center">
-                            reCAPTCHA expired. It will be refreshed
-                            automatically when you submit.
+                            {t("contacts.recaptchaExpired")}
                           </div>
                         )}
                         {isWithinGracePeriod() && !recaptchaToken && (
                           <div className="mt-2 text-xs text-green-600 font-medium text-center">
-                            ✓ Verified - You can make changes for{" "}
-                            {Math.ceil(
-                              (RECAPTCHA_GRACE_PERIOD -
-                                (Date.now() - (recaptchaVerifiedAt || 0))) /
-                                1000
-                            )}{" "}
-                            more seconds
+                            ✓{" "}
+                            {t("contacts.recaptchaGracePeriod", {
+                              seconds: Math.ceil(
+                                (RECAPTCHA_GRACE_PERIOD -
+                                  (Date.now() - (recaptchaVerifiedAt || 0))) /
+                                  1000
+                              ).toString(),
+                            })}
                           </div>
                         )}
                       </div>
@@ -439,12 +436,14 @@ export default function ContactsPage() {
                         className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-inter font-extrabold text-base lg:text-lg transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         style={{ color: "#5741FF" }}
                       >
-                        {isSubmitting ? "Submitting..." : "Submit"}
+                        {isSubmitting
+                          ? t("common.submitting")
+                          : t("common.submit")}
                       </button>
                       {/* Helper text for disabled state */}
                       {!recaptchaToken && dirty && (
                         <p className="mt-2 text-xs text-gray-600 text-center">
-                          Please complete the reCAPTCHA to submit
+                          {t("contacts.recaptchaHelperText")}
                         </p>
                       )}
                     </div>

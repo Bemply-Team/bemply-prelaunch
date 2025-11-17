@@ -2,8 +2,9 @@
 
 import type { ReactNode } from "react";
 import AnimatedBackground from "@/app/how-soon/components/animated-background";
-import Image from "next/image";
 import Link from "next/link";
+import LanguageSelector from "@/components/language-selector";
+import { useLanguage } from "@/context/language-context";
 
 interface SharedLayoutProps {
   children: ReactNode;
@@ -16,6 +17,7 @@ export default function SharedLayout({
   showFooter = true,
   variant = "default",
 }: SharedLayoutProps) {
+  const { t } = useLanguage();
   // Consistent container dimensions based on variant
   const getContainerClasses = () => {
     const baseClasses =
@@ -56,38 +58,80 @@ export default function SharedLayout({
 
       {/* Footer with consistent spacing */}
       {showFooter && (
-        <div className="relative z-10 w-full flex justify-between items-center py-2 sm:py-3 md:py-4 lg:py-2 xl:py-3 px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-6xl mx-auto flex flex-col sm:flex-row  items-center space-y-1 sm:space-y-0">
-            <div className="flex-1 flex justify-center">
-              <p className="font-cousine font-medium text-xs sm:text-sm text-violet text-center sm:text-left">
-                Built with care by Bemply Inc. |{" "}
-                <Link href="/about" className="hover:underline">
-                  Learn more
-                </Link>{" "}
-                -{" "}
-                <Link href="/about" className="hover:underline">
-                  [About Us]
-                </Link>{" "}
-                |{" "}
-                <Link href="/terms" className="hover:underline">
-                  Terms
-                </Link>{" "}
-                |{" "}
-                <Link href="/privacy" className="hover:underline">
-                  Privacy
-                </Link>
-              </p>
+        <div className="relative z-10 w-full py-2 sm:py-3 md:py-4 lg:py-2 xl:py-3 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-6xl mx-auto">
+            {/* Desktop Footer */}
+            <div className="hidden md:flex items-center justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="font-cousine font-medium text-[10px] lg:text-xs text-violet leading-relaxed">
+                  {t("layout.footer.builtWithCare")} |{" "}
+                  <Link href="/about" className="hover:underline">
+                    {t("layout.footer.learnMore")}
+                  </Link>{" "}
+                  -{" "}
+                  <Link href="/about" className="hover:underline">
+                    {t("layout.footer.aboutUs")}
+                  </Link>{" "}
+                  |{" "}
+                  <Link href="/terms" className="hover:underline">
+                    {t("layout.footer.terms")}
+                  </Link>{" "}
+                  |{" "}
+                  <Link href="/privacy" className="hover:underline">
+                    {t("layout.footer.privacy")}
+                  </Link>
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <LanguageSelector />
+              </div>
             </div>
 
-            <button className="hover:opacity-80 transition-opacity">
-              <Image
-                src="/icons/globe.png"
-                alt="Globe"
-                width={20}
-                height={20}
-                className="sm:w-6 sm:h-6 lg:w-7 lg:h-7"
-              />
-            </button>
+            {/* Mobile Footer */}
+            <div className="md:hidden flex flex-col items-center gap-3">
+              <div className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1 text-center">
+                <span className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet">
+                  {t("layout.footer.builtWithCare")}
+                </span>
+                <span className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet">
+                  |
+                </span>
+                <Link
+                  href="/about"
+                  className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet hover:underline"
+                >
+                  {t("layout.footer.learnMore")}
+                </Link>
+                <span className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet">
+                  -
+                </span>
+                <Link
+                  href="/about"
+                  className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet hover:underline"
+                >
+                  {t("layout.footer.aboutUs")}
+                </Link>
+                <span className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet">
+                  |
+                </span>
+                <Link
+                  href="/terms"
+                  className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet hover:underline"
+                >
+                  {t("layout.footer.terms")}
+                </Link>
+                <span className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet">
+                  |
+                </span>
+                <Link
+                  href="/privacy"
+                  className="font-cousine font-medium text-[9px] sm:text-[10px] text-violet hover:underline"
+                >
+                  {t("layout.footer.privacy")}
+                </Link>
+              </div>
+              <LanguageSelector />
+            </div>
           </div>
         </div>
       )}

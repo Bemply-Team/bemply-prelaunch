@@ -4,8 +4,10 @@ import SharedLayout from "@/components/shared-layout";
 import SharedNavigation from "@/components/shared-navigation";
 import SocialIcons from "./components/social-icons";
 import Image from "next/image";
+import { useLanguage } from "@/context/language-context";
 
 export default function ThankYouPage() {
+  const { t } = useLanguage();
   return (
     <SharedLayout variant="default" showFooter={true}>
       {/* Main content with consistent structure */}
@@ -27,32 +29,28 @@ export default function ThankYouPage() {
             className="font-josefin font-bold text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl tracking-[0.2em] sm:tracking-[0.25em] lg:tracking-[0.3em]"
             style={{ color: "#5741FF" }}
           >
-            THANK YOU FOR JOINING
+            {t("thankYou.title")}
           </h1>
 
           {/* Content Text - Using Cousine with exact line breaks */}
           <div>
             <p className="font-cousine text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl text-gray-700 leading-relaxed">
-              Thank you for your interest in Bemply !
+              {t("thankYou.message1")}
             </p>
 
             <p className="font-cousine text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl text-gray-700 leading-relaxed">
-              Keep an eye on your inbox for exciting updates and your
-              <br />
-              invite when we go live.
+              {t("thankYou.message2")}
             </p>
 
             <p className="font-cousine text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl text-gray-700 leading-relaxed">
-              Follow us and get ready to transform the way hiring (and
-              <br />
-              job hunting) happens.
+              {t("thankYou.message3")}
             </p>
           </div>
 
           {/* Signature */}
           <div className="pt-4 lg:pt-6">
             <p className="font-cousine text-sm sm:text-base md:text-lg lg:text-lg xl:text-xl text-gray-700">
-              — The Bemply Team ✨
+              {t("thankYou.signature")}
             </p>
           </div>
         </div>

@@ -3,9 +3,11 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { storageService } from "@/services/storage";
+import { useLanguage } from "@/context/language-context";
 
 export default function NotifyButton() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleClick = () => {
     // Check if user has already joined waitlist
@@ -31,7 +33,7 @@ export default function NotifyButton() {
           height={22}
           className="mr-3 sm:w-6 sm:h-6 lg:w-6 lg:h-6 xl:w-10 xl:h-7"
         />
-        Notify Me
+        {t("common.notifyMe")}
       </button>
     </div>
   );

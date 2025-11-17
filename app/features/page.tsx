@@ -6,8 +6,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useWaitlist } from "@/context/waitlist-context";
 import NotifyButton from "@/components/notify-button";
+import { useLanguage } from "@/context/language-context";
 
 export default function FeaturesPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const { isComplete } = useWaitlist();
 
@@ -30,17 +32,17 @@ export default function FeaturesPage() {
             style={{ wordSpacing: "0.2rem" }}
             className="font-cuprum text-gray-800 font-semibold text-lg  md:text-xl xl:text-2xl  tracking-wider   leading-tight"
           >
-            Welcome to Bemply — Where Belonging Meets Opportunity.
+            {t("features.welcome")}
           </h2>
         </div>
 
         {/* Features Title - Left aligned */}
         <div className="text-left mb-4 lg:mb-6 md:mt-12">
           <h1 className="font-cuprum font-bold text-gray-900  text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            FEATURES YOU'LL ACTUALLY USE
+            {t("features.title")}
           </h1>
           <p className="font-cuprum text-gray-800  text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            (And some you never knew you needed.)
+            {t("features.subtitle")}
           </p>
         </div>
 
@@ -49,106 +51,96 @@ export default function FeaturesPage() {
           {/* Feature I */}
           <div>
             <h3 className="font-cuprum font-bold  text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              I. Security-First Onboarding
+              {t("features.feature1.title")}
             </h3>
             <p className="font-cuprum text-gray-800   text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              All organizations go through AI-powered verification before
-              joining.
+              {t("features.feature1.description1")}
             </p>
             <p className="font-cuprum text-gray-800  text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              No shady actors. No fake job offers. Just trusted opportunities.
+              {t("features.feature1.description2")}
             </p>
           </div>
 
           {/* Feature II */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900  text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              II. Smart AI Matching
+              {t("features.feature2.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Our AI doesn't just show jobs or applicants — it shows you the
-              best fit, with a match % and a clear explanation of why.
+              {t("features.feature2.description")}
             </p>
           </div>
 
           {/* Feature III */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              III. Company Boards
+              {t("features.feature3.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Every organization gets a public-facing profile with real reviews,
-              team info, job posts, and ratings — and can't fake a thing.
+              {t("features.feature3.description")}
             </p>
           </div>
 
           {/* Feature IV */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              IV. Applicant Insights for Recruiters
+              {t("features.feature4.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              See who applied, how well they match, and manage rounds with
-              transparency. Structured reviews, required feedback on rejections,
-              and smart interview scheduling tools are all built in.
+              {t("features.feature4.description")}
             </p>
           </div>
 
           {/* Feature V */}
           <div>
             <h3 className="font-cuprum font-bold text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              V. Bemply Conference (Premium)
+              {t("features.feature5.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Schedule live interviews and meetings directly from your dashboard
-              — fully integrated and optimized for hiring.
+              {t("features.feature5.description")}
             </p>
           </div>
 
           {/* Feature VI */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              VI. In-Message Communication
+              {t("features.feature6.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Companies can message candidates (all plans). Candidates can reply
-              — but never get spammed.
+              {t("features.feature6.description")}
             </p>
           </div>
 
           {/* Feature VII */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              VII. Watchlist & Dashboard for Candidates
+              {t("features.feature7.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Keep track of your applications, get notified about next steps,
-              and never miss a deadline again.
+              {t("features.feature7.description1")}
             </p>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Set jobs aside for later with your personalized "Watchlist."
+              {t("features.feature7.description2")}
             </p>
           </div>
 
           {/* Feature VIII */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              VIII. For Internships Too
+              {t("features.feature8.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Universities and research labs can post internships and connect
-              with early talent. Same tools, same protections.
+              {t("features.feature8.description")}
             </p>
           </div>
 
           {/* Feature IX */}
           <div>
             <h3 className="font-cuprum font-bold text-gray-900 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              IX. Widget-Powered Dashboards
+              {t("features.feature9.title")}
             </h3>
             <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-              Customize your experience. Visualize stats. Track progress. Make
-              your space yours.
+              {t("features.feature9.description")}
             </p>
           </div>
         </div>

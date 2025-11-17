@@ -6,8 +6,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useWaitlist } from "@/context/waitlist-context";
 import NotifyButton from "@/components/notify-button";
+import { useLanguage } from "@/context/language-context";
 
 export default function AboutPage() {
+  const { t } = useLanguage();
   const router = useRouter();
   const { isComplete } = useWaitlist();
 
@@ -27,39 +29,34 @@ export default function AboutPage() {
         {/* Welcome Message - Left aligned */}
         <div className="text-left mb-6 lg:mb-8">
           <h2 className="font-cuprum font-semibold text-gray-800 text-md md:text-lg lg:text-xl leading- tracking-wide">
-            Welcome to Bemply — Where Belonging Meets Opportunity.
+            {t("about.welcome")}
           </h2>
         </div>
 
         {/* About Content - Left aligned with consistent spacing */}
         <div className="text-left space-y-2">
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            We believe that people thrive where they feel seen, supported, and
-            safe.
+            {t("about.paragraph1")}
           </p>
 
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            That's why Bemply isn't just another job platform — it's a new kind
-            of space where companies, universities, and individuals connect
-            through trust, transparency, and meaningful matches.
+            {t("about.paragraph2")}
           </p>
 
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            In a world where candidates ghost and companies scam, we're building
-            a platform with security, clarity, and fairness at the core.
+            {t("about.paragraph3")}
           </p>
 
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            Our mission is simple:
+            {t("about.mission")}
           </p>
 
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            Help people find the right place to grow — not just any place that
-            hires.
+            {t("about.missionStatement")}
           </p>
 
           <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            And we do it by blending:
+            {t("about.approach")}
           </p>
 
           {/* Bulleted List with consistent spacing */}
@@ -69,7 +66,7 @@ export default function AboutPage() {
                 •
               </span>
               <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-                Smart AI matching for quality connections
+                {t("about.feature1")}
               </p>
             </div>
             <div className="flex items-start">
@@ -77,7 +74,7 @@ export default function AboutPage() {
                 •
               </span>
               <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-                Real reviews and public profiles to keep everyone accountable
+                {t("about.feature2")}
               </p>
             </div>
             <div className="flex items-start">
@@ -85,7 +82,7 @@ export default function AboutPage() {
                 •
               </span>
               <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-                Verification systems to block scams before they start
+                {t("about.feature3")}
               </p>
             </div>
             <div className="flex items-start">
@@ -93,15 +90,13 @@ export default function AboutPage() {
                 •
               </span>
               <p className="font-cuprum text-gray-800 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-                A focus on belonging, not just "applying"
+                {t("about.feature4")}
               </p>
             </div>
           </div>
 
           <p className="font-cuprum text-gray-800 pt-2 text-md md:text-lg lg:text-xl leading-tight tracking-wide">
-            Whether you're hiring your next intern or looking for your next
-            challenge, Bemply is the platform built with care — and built for
-            you.
+            {t("about.closing")}
           </p>
         </div>
       </div>
