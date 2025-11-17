@@ -28,42 +28,49 @@ export default function ProgressSection() {
       {/* Company Logos and Text - Stacked horizontally with optimized spacing */}
       <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 lg:space-x-4 xl:space-x-5">
         <div className="flex items-center -space-x-1">
-          {submissions && submissions.length
-            ? submissions
-                .slice(0, myWaitlistData?.company ? 3 : 4)
-                .map((submission, index) => (
-                  <CompanyAvatar
-                    key={submission.id}
-                    companyName={submission.company}
-                    size="md"
-                    className={`relative z-${
-                      10 + index * 10
-                    } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
-                  />
-                ))
-            : null}
-          {myWaitlistData ? (
-            <CompanyAvatar
-              key={myWaitlistData.id}
-              companyName={myWaitlistData.company}
-              size="md"
-              className={`relative z-${
-                10 + 4 * 10
-              } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
-            />
-          ) : null}
-          {/* Show placeholder avatars if we have less than 4 submissions */}
-          {submissions.length < 4 &&
-            Array.from({ length: 4 - submissions.length }).map((_, index) => (
+          {(() => {
+            if (!submissions || submissions.length === 0) return null;
+
+            // Check if myWaitlistData is already in submissions to avoid duplicates
+            const isMyDataInSubmissions = myWaitlistData
+              ? submissions.some(
+                  (submission) =>
+                    submission.email === myWaitlistData.email ||
+                    submission.company === myWaitlistData.company
+                )
+              : false;
+
+            // If myWaitlistData exists and is not in submissions, add it
+            // Otherwise, just use submissions
+            const allSubmissions = myWaitlistData && !isMyDataInSubmissions
+              ? [
+                  ...submissions,
+                  {
+                    id: Number(myWaitlistData.id) || Date.now(),
+                    company: myWaitlistData.company,
+                    email: myWaitlistData.email,
+                    first_name: myWaitlistData.first_name,
+                    last_name: myWaitlistData.last_name,
+                    position: myWaitlistData.position,
+                    industry: myWaitlistData.industry,
+                  },
+                ]
+              : submissions;
+
+            // Show up to 4 company avatars
+            const displaySubmissions = allSubmissions.slice(0, 4);
+
+            return displaySubmissions.map((submission, index) => (
               <CompanyAvatar
-                key={`placeholder-${index}`}
-                companyName="Company"
+                key={submission.id || `submission-${index}`}
+                companyName={submission.company}
                 size="md"
                 className={`relative z-${
-                  10 + (submissions.length + index) * 10
-                } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 opacity-50`}
+                  10 + index * 10
+                } sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6`}
               />
-            ))}
+            ));
+          })()}
         </div>
         <span className="font-montserrat font-semibold text-base sm:text-sm lg:text-base xl:text-sm text-gray-700 text-center">
           Join {count}+ others on the waitlist
