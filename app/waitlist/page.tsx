@@ -469,9 +469,10 @@ export default function WaitlistPage() {
                           </div>
                         )}
                         {recaptchaToken && (
-                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
-                            ✓ reCAPTCHA verified
-                          </div>
+                          <div
+                            className="mt-2 text-xs font-medium text-center h-4"
+                            aria-hidden="true"
+                          />
                         )}
                       </div>
                     </div>
