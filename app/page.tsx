@@ -6,14 +6,14 @@ import { useWaitlist } from "@/context/waitlist-context";
 
 export default function Home() {
   const router = useRouter();
-  const { isComplete, isLoading } = useWaitlist();
+  const { isLoading } = useWaitlist();
 
   useEffect(() => {
     if (!isLoading) {
-      // Redirect to the appropriate page based on waitlist status
-      router.push(isComplete ? "/early-access" : "/how-soon");
+      // Always redirect to how-soon page
+      router.push("/how-soon");
     }
-  }, [isComplete, isLoading, router]);
+  }, [isLoading, router]);
 
   // Loading state while checking waitlist status
   if (isLoading) {

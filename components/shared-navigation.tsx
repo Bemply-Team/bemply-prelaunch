@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useWaitlist } from "@/context/waitlist-context";
 import MobileMenu from "@/app/how-soon/components/mobile-menu";
 
 interface SharedNavigationProps {
@@ -18,10 +17,9 @@ export default function SharedNavigation({
   variant = "default",
 }: SharedNavigationProps) {
   const pathname = usePathname();
-  const { isComplete } = useWaitlist();
 
-  // Determine the home page based on waitlist status
-  const homePage = isComplete ? "/early-access" : "/how-soon";
+  // Always use how-soon as the home page
+  const homePage = "/how-soon";
 
   // Check if a nav item is active
   const isActive = (path: string) => {
@@ -31,8 +29,8 @@ export default function SharedNavigation({
     return pathname === path;
   };
 
-  // Determine the text for the home page link
-  const homeText = isComplete ? "Early Access" : "How Soon";
+  // Always use "How Soon" as the home text
+  const homeText = "How Soon";
 
   return (
     <nav
@@ -161,7 +159,7 @@ export default function SharedNavigation({
       {/* Mobile Navigation */}
       {variant === "default" ? (
         <div className="md:hidden w-full flex justify-end">
-          <MobileMenu isEarlyAccess={isComplete} />
+          <MobileMenu isEarlyAccess={false} />
         </div>
       ) : (
         <div className="md:hidden w-full flex justify-center space-x-6">

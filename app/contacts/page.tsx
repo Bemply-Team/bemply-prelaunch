@@ -411,12 +411,6 @@ export default function ContactsPage() {
                             {recaptchaError}
                           </div>
                         )}
-                        {isRecaptchaExpired && !isWithinGracePeriod() && (
-                          <div className="mt-2 text-xs text-amber-600 font-medium text-center">
-                            reCAPTCHA expired. It will be refreshed
-                            automatically when you submit.
-                          </div>
-                        )}
                         {isWithinGracePeriod() && !recaptchaToken && (
                           <div className="mt-2 text-xs text-green-600 font-medium text-center">
                             ✓ Verified - You can make changes for{" "}

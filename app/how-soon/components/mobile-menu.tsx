@@ -13,8 +13,8 @@ export default function MobileMenu({ isEarlyAccess = false }: MobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
 
-  // Determine the home page based on waitlist status
-  const homePage = isEarlyAccess ? "/early-access" : "/how-soon"
+  // Always use how-soon as the home page
+  const homePage = "/how-soon"
 
   // Check if a nav item is active
   const isActive = (path: string) => {
@@ -24,8 +24,8 @@ export default function MobileMenu({ isEarlyAccess = false }: MobileMenuProps) {
     return pathname === path
   }
 
-  // Determine the text for the home page link
-  const homeText = isEarlyAccess ? "Early Access" : "How Soon"
+  // Always use "How Soon" as the home text
+  const homeText = "How Soon"
 
   return (
     <>
