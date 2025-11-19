@@ -15,7 +15,7 @@ export default function LanguageSelector() {
           <button
             type="button"
             aria-label={t("languageSelector.triggerLabel")}
-            className="flex items-center justify-center rounded-full bg-white/80 hover:bg-white shadow-lg border border-gray-200/70 p-2 sm:p-2.5 transition-all duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            className="flex items-center justify-center rounded-full   p-2 sm:p-2.5 transition-all duration-200 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           >
             <Image
               src="/icons/globe.png"
