@@ -5,20 +5,9 @@ import ComingSoonSection from "./coming-soon-section";
 import ProgressSection from "./progress-section";
 import NotifyButton from "@/components/notify-button";
 import SocialIcons from "./social-icons";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useWaitlist } from "@/context/waitlist-context";
 
 export default function HowSoonPageContainer() {
-  const router = useRouter();
-  const { isComplete, isLoading } = useWaitlist();
-
-  useEffect(() => {
-    if (!isLoading && isComplete) {
-      // Redirect to the appropriate page based on waitlist status
-      router.push("/early-access");
-    }
-  }, [isComplete, isLoading, router]);
+  // Early access redirect removed - keeping users on how-soon page
 
   return (
     <>

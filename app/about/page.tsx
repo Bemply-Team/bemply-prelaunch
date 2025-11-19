@@ -4,17 +4,15 @@ import SharedLayout from "@/components/shared-layout";
 import SharedNavigation from "@/components/shared-navigation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useWaitlist } from "@/context/waitlist-context";
 import NotifyButton from "@/components/notify-button";
 import { useLanguage } from "@/context/language-context";
 
 export default function AboutPage() {
   const { t } = useLanguage();
   const router = useRouter();
-  const { isComplete } = useWaitlist();
 
   const handleNotifyClick = () => {
-    router.push(isComplete ? "/early-access" : "/waitlist");
+    router.push("/waitlist");
   };
 
   return (

@@ -22,8 +22,8 @@ export default function SharedNavigation({
   const { isComplete } = useWaitlist();
   const { t } = useLanguage();
 
-  // Determine the home page based on waitlist status
-  const homePage = isComplete ? "/early-access" : "/how-soon";
+  // Always use how-soon as the home page
+  const homePage = "/how-soon";
 
   // Check if a nav item is active
   const isActive = (path: string) => {
@@ -163,7 +163,7 @@ export default function SharedNavigation({
       {/* Mobile Navigation */}
       {variant === "default" ? (
         <div className="md:hidden w-full flex justify-end">
-          <MobileMenu isEarlyAccess={isComplete} />
+          <MobileMenu isEarlyAccess={false} />
         </div>
       ) : (
         <div className="md:hidden w-full flex justify-center space-x-3 sm:space-x-4">

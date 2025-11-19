@@ -78,14 +78,11 @@ class ApiService {
     } catch (error) {
       console.error("Failed to get waitlist status:", error);
 
-      // Fallback to mock data if API fails
-      const mockPercentage =
-        Math.random() > 0.8 ? 100 : Math.floor(Math.random() * 95) + 1;
-
+      // Return 0% and 0 count when fetch fails
       return {
-        percentage: mockPercentage,
-        count: Math.floor((mockPercentage / 100) * 300),
-        isComplete: mockPercentage >= 100,
+        percentage: 0,
+        count: 0,
+        isComplete: false,
         submissions: [],
       };
     }

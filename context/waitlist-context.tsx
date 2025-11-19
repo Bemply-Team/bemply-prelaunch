@@ -74,8 +74,15 @@ export const WaitlistProvider = ({ children }: { children: ReactNode }) => {
       }));
     } catch (error) {
       console.error("Failed to load waitlist status:", error);
-      // Keep cached data or default to loading state
-      setStatus((prev) => ({ ...prev, isLoading: false }));
+      // Set to 0% and 0 count when fetch fails
+      setStatus({
+        isComplete: false,
+        percentage: 0,
+        count: 0,
+        isLoading: false,
+        submissions: [],
+        refreshWaitlistData: checkWaitlistStatus,
+      });
     }
   };
   useEffect(() => {
