@@ -59,6 +59,7 @@ export const enMessages = {
     industry: "Industry",
     industryPlaceholder: "Select your industry",
     recaptchaRequired: "Please complete the reCAPTCHA to submit",
+    recaptchaVerified: "reCAPTCHA verified",
     validation: {
       firstNameRequired: "First name is required",
       firstNameMin: "First name must be at least 2 characters",

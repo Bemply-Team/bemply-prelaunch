@@ -59,6 +59,7 @@ export const esMessages = {
     industry: "Industria",
     industryPlaceholder: "Selecciona tu industria",
     recaptchaRequired: "Por favor completa el reCAPTCHA para enviar",
+    recaptchaVerified: "reCAPTCHA verificado",
     validation: {
       firstNameRequired: "El nombre es obligatorio",
       firstNameMin: "El nombre debe tener al menos 2 caracteres",
