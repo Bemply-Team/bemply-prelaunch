@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
   type ReactNode,
+  Suspense,
 } from "react";
 import { useSearchParams } from "next/navigation";
 import { storageService } from "@/services/storage";
@@ -38,7 +39,10 @@ const LanguageContext = createContext<LanguageContextValue | undefined>(
 function resolveMessage(dictionary: any, key: string): string | undefined {
   return key
     .split(".")
-    .reduce<any>((acc, part) => (acc && typeof acc === "object" ? acc[part] : undefined), dictionary);
+    .reduce<any>(
+      (acc, part) => (acc && typeof acc === "object" ? acc[part] : undefined),
+      dictionary
+    );
 }
 
 function normalizeLanguage(input: string | null): LanguageCode | null {
@@ -50,24 +54,35 @@ function normalizeLanguage(input: string | null): LanguageCode | null {
   return null;
 }
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+// Separate component that uses useSearchParams
+function LanguageParamHandler({
+  onLanguageFromParam,
+}: {
+  onLanguageFromParam: (lang: LanguageCode | null) => void;
+}) {
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const paramLang = searchParams?.get("lang");
+    const fromParam = normalizeLanguage(paramLang);
+    onLanguageFromParam(fromParam);
+  }, [searchParams, onLanguageFromParam]);
+
+  return null;
+}
+
+function LanguageProviderInner({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>(DEFAULT_LANGUAGE);
 
   // Determine initial language on first client render
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const paramLang = searchParams?.get("lang");
-    const fromParam = normalizeLanguage(paramLang);
     const stored = normalizeLanguage(storageService.getLanguagePreference());
 
     let initial: LanguageCode = DEFAULT_LANGUAGE;
 
-    if (fromParam) {
-      initial = fromParam;
-      storageService.storeLanguagePreference(initial);
-    } else if (stored) {
+    if (stored) {
       initial = stored;
     } else if (typeof navigator !== "undefined") {
       initial =
@@ -78,7 +93,15 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     }
 
     setLanguageState(initial);
-  }, [searchParams]);
+  }, []);
+
+  // Handle language from URL params
+  const handleLanguageFromParam = (fromParam: LanguageCode | null) => {
+    if (fromParam) {
+      setLanguageState(fromParam);
+      storageService.storeLanguagePreference(fromParam);
+    }
+  };
 
   // Reflect language on the <html> element for accessibility/SEO
   useEffect(() => {
@@ -129,15 +152,40 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [language]);
 
   return (
-    <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>
+    <LanguageContext.Provider value={value}>
+      <Suspense fallback={null}>
+        <LanguageParamHandler onLanguageFromParam={handleLanguageFromParam} />
+      </Suspense>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export const LanguageProvider = ({ children }: { children: ReactNode }) => {
+  return (
+    <Suspense fallback={<div>{children}</div>}>
+      <LanguageProviderInner>{children}</LanguageProviderInner>
+    </Suspense>
   );
 };
 
 export const useLanguage = () => {
   const ctx = useContext(LanguageContext);
   if (!ctx) {
+    // During SSR/build time, return a default implementation
+    if (typeof window === "undefined") {
+      return {
+        language: DEFAULT_LANGUAGE,
+        setLanguage: () => {},
+        t: (key: string) => key,
+        availableLanguages: [
+          { code: "en" as LanguageCode, label: "English" },
+          { code: "fr" as LanguageCode, label: "Français" },
+          { code: "es" as LanguageCode, label: "Español" },
+        ],
+      };
+    }
     throw new Error("useLanguage must be used within a LanguageProvider");
   }
   return ctx;
 };
-

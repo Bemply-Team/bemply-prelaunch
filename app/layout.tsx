@@ -11,10 +11,7 @@ import {
 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
-// Import the WaitlistProvider
-import { WaitlistProvider } from "@/context/waitlist-context";
-import { LanguageProvider } from "@/context/language-context";
-import SplashScreen from "@/components/splash-wrapper";
+import { Providers } from "@/components/providers";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -95,11 +92,7 @@ export default function RootLayout({
       <body
         className={`${montserrat.variable} ${cousine.variable} ${josefinSans.variable} ${oswald.variable} ${inter.variable} ${cuprum.variable} ${lato.variable} antialiased`}
       >
-        <WaitlistProvider>
-          <LanguageProvider>
-            <SplashScreen>{children}</SplashScreen>
-          </LanguageProvider>
-        </WaitlistProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
