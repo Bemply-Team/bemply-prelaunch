@@ -32,13 +32,7 @@ export default function WaitlistPage() {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaError, setRecaptchaError] = useState<string>("");
   const [isRecaptchaExpired, setIsRecaptchaExpired] = useState(false);
-  const [recaptchaVerifiedAt, setRecaptchaVerifiedAt] = useState<number | null>(
-    null
-  );
   const recaptchaRef = useRef<ReCAPTCHA>(null);
-
-  // 1 minute grace period in milliseconds
-  const RECAPTCHA_GRACE_PERIOD = 60 * 1000;
 
   // Validation schema with translations
   const WaitlistSchema = Yup.object().shape({
@@ -78,80 +72,17 @@ export default function WaitlistPage() {
     setRecaptchaToken(token);
     setRecaptchaError("");
     setIsRecaptchaExpired(false);
-
-    // Record verification time when token is received
-    if (token) {
-      setRecaptchaVerifiedAt(Date.now());
-    } else {
-      setRecaptchaVerifiedAt(null);
-    }
   };
 
   const handleRecaptchaExpired = () => {
     setRecaptchaToken(null);
     setIsRecaptchaExpired(true);
-    setRecaptchaVerifiedAt(null);
-    setRecaptchaError("reCAPTCHA has expired. Please verify again.");
+    setRecaptchaError(t("waitlist.recaptchaExpired"));
   };
 
   const handleRecaptchaError = () => {
     setRecaptchaToken(null);
-    setRecaptchaError("reCAPTCHA verification failed. Please try again.");
-    setRecaptchaVerifiedAt(null);
-  };
-
-  // Check if we're still within the grace period
-  const isWithinGracePeriod = () => {
-    if (!recaptchaVerifiedAt) return false;
-    const timeElapsed = Date.now() - recaptchaVerifiedAt;
-    return timeElapsed < RECAPTCHA_GRACE_PERIOD;
-  };
-
-  // Check if reCAPTCHA is considered valid (has token or within grace period)
-  const isRecaptchaValid = () => {
-    return recaptchaToken || isWithinGracePeriod();
-  };
-
-  const executeRecaptcha = async (): Promise<string | null> => {
-    // If we have a valid token, use it
-    if (recaptchaToken && !isRecaptchaExpired) {
-      return recaptchaToken;
-    }
-
-    // If we're within grace period, try to execute invisibly first
-    if (isWithinGracePeriod()) {
-      try {
-        if (recaptchaRef.current) {
-          const token = await recaptchaRef.current.executeAsync();
-          setRecaptchaToken(token);
-          setRecaptchaError("");
-          setIsRecaptchaExpired(false);
-          return token;
-        }
-      } catch (error) {
-        console.log(
-          "Invisible reCAPTCHA execution failed, user will need to verify manually"
-        );
-      }
-    }
-
-    // If no token or expired, try to execute reCAPTCHA
-    try {
-      if (recaptchaRef.current) {
-        const token = await recaptchaRef.current.executeAsync();
-        setRecaptchaToken(token);
-        setRecaptchaError("");
-        setIsRecaptchaExpired(false);
-        return token;
-      }
-    } catch (error) {
-      console.error("reCAPTCHA execution failed:", error);
-      setRecaptchaError(
-        "reCAPTCHA verification failed. Please complete the verification manually."
-      );
-    }
-
-    return null;
+    setRecaptchaError(t("waitlist.recaptchaFailed"));
   };
 
   const handleSubmit = async (
@@ -159,21 +90,8 @@ export default function WaitlistPage() {
     { setSubmitting, resetForm }: any
   ) => {
     try {
-      // Try to get a valid reCAPTCHA token
-      let validToken = recaptchaToken;
-
-      // If no token but within grace period, try to get a fresh token
-      if (!validToken && isWithinGracePeriod()) {
-        validToken = await executeRecaptcha();
-      }
-
-      // If no token and not within grace period, try to execute reCAPTCHA
-      if (!validToken && !isWithinGracePeriod()) {
-        validToken = await executeRecaptcha();
-      }
-
-      // If still no token, show error but allow manual completion
-      if (!validToken) {
+      // Check if we have a valid reCAPTCHA token
+      if (!recaptchaToken) {
         setRecaptchaError(t("waitlist.recaptchaRequired"));
         setSubmitting(false);
         return;
@@ -182,7 +100,7 @@ export default function WaitlistPage() {
       // Submit waitlist form using API service
       const response = await apiService.submitWaitlist({
         ...values,
-        recaptcha: validToken,
+        recaptcha: recaptchaToken,
       });
 
       if (response.success) {
@@ -191,12 +109,11 @@ export default function WaitlistPage() {
 
         await refreshWaitlistData();
 
-        // Reset reCAPTCHA and clear grace period
+        // Reset reCAPTCHA
         recaptchaRef.current?.reset();
         setRecaptchaToken(null);
         setRecaptchaError("");
         setIsRecaptchaExpired(false);
-        setRecaptchaVerifiedAt(null);
 
         // Redirect to thank you page
         router.push("/thank-you");
@@ -206,7 +123,6 @@ export default function WaitlistPage() {
         recaptchaRef.current?.reset();
         setRecaptchaToken(null);
         setIsRecaptchaExpired(false);
-        setRecaptchaVerifiedAt(null);
       }
     } catch (error) {
       showToast("error", t("waitlist.errorMessage"));
@@ -214,7 +130,6 @@ export default function WaitlistPage() {
       recaptchaRef.current?.reset();
       setRecaptchaToken(null);
       setIsRecaptchaExpired(false);
-      setRecaptchaVerifiedAt(null);
     } finally {
       setSubmitting(false);
     }
@@ -448,21 +363,9 @@ export default function WaitlistPage() {
                             {recaptchaError}
                           </div>
                         )}
-                        {isRecaptchaExpired && !isWithinGracePeriod() && (
+                        {isRecaptchaExpired && (
                           <div className="mt-2 text-xs text-amber-600 font-medium text-center">
                             {t("waitlist.recaptchaExpired")}
-                          </div>
-                        )}
-                        {isWithinGracePeriod() && !recaptchaToken && (
-                          <div className="mt-2 text-xs text-green-600 font-medium text-center">
-                            ✓{" "}
-                            {t("waitlist.recaptchaGracePeriod", {
-                              seconds: Math.ceil(
-                                (RECAPTCHA_GRACE_PERIOD -
-                                  (Date.now() - (recaptchaVerifiedAt || 0))) /
-                                  1000
-                              ).toString(),
-                            })}
                           </div>
                         )}
                         {recaptchaToken && (
