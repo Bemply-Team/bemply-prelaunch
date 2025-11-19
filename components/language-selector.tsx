@@ -31,7 +31,7 @@ export default function LanguageSelector() {
           <DropdownMenu.Content
             sideOffset={10}
             align="end"
-            className="min-w-[10rem] rounded-xl bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-xl p-1.5 text-sm sm:text-base animate-in fade-in-0 zoom-in-95 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:slide-in-from-top-2 will-change-[transform,opacity]"
+            className="min-w-[10rem] rounded-xl bg-white/95 backdrop-blur-md border border-gray-200/80 shadow-xl p-1.5 text-sm sm:text-base animate-in fade-in-0 zoom-in-95 data-[side=top]:slide-in-from-bottom-2 data-[side=bottom]:slide-in-from-top-2 will-change-[transform,opacity] z-50"
           >
             {availableLanguages.map((item) => (
               <DropdownMenu.Item
